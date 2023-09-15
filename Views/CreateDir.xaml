@@ -1,0 +1,70 @@
+﻿<Window x:Class="XPloteQuickBuidProj.Views.CreateDir"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:XPloteQuickBuidProj.Views"
+             mc:Ignorable="d" 
+             WindowState="Normal"
+             WindowStartupLocation="CenterScreen"
+             WindowStyle="ThreeDBorderWindow"
+             ResizeMode="CanResizeWithGrip"
+             d:DesignHeight="210" d:DesignWidth="350" MaxWidth="350" MaxHeight="250">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary>
+                    <Style TargetType="{x:Type DockPanel}">
+                        <Setter Property="LastChildFill" Value="True"></Setter>
+                        <Setter Property="Margin" Value="0,10,0,0"></Setter>
+                    </Style>
+                </ResourceDictionary>
+                <ResourceDictionary>
+                    <Style TargetType="{x:Type Label}">
+                        <Setter Property="Width" Value="80"></Setter>
+                    </Style>
+                </ResourceDictionary>
+                <ResourceDictionary>
+                      <Style TargetType="{x:Type TextBox}">
+                        <Setter Property="BorderThickness" Value="0,0,0,0.5"></Setter>
+                        <Setter Property="BorderBrush" Value="LightGray"></Setter>
+                        <Setter Property="VerticalAlignment" Value="Center"></Setter>
+                        <Setter Property="Margin" Value="0,0,0,2"></Setter>
+                    </Style>
+                </ResourceDictionary>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="0"></RowDefinition>
+            <RowDefinition></RowDefinition>
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="1">
+            <StackPanel Margin="5">
+                <DockPanel LastChildFill="True">
+                    <Label Content="Sdk文件夹: "></Label>
+                    <Button DockPanel.Dock="Right" Command="{Binding gModel.gSetSdkDir}" Width="50" Background="Transparent" BorderThickness="0" Content="设置目录"></Button>
+                    <TextBox TextWrapping="Wrap" BorderThickness="0,0,0,0.5" Text="{Binding gModel.gSdkDir,UpdateSourceTrigger=PropertyChanged}"></TextBox>
+                </DockPanel>
+                <DockPanel LastChildFill="True">
+                    <Label Content="库名: "></Label>
+                    <TextBox Text="{Binding gModel.gDllName,UpdateSourceTrigger=PropertyChanged,Delay=300,Mode=TwoWay}"></TextBox>
+                </DockPanel>
+                <DockPanel LastChildFill="True">
+                    <Label Content="库版本: "></Label>
+                    <TextBox Text="{Binding gModel.gVersion,UpdateSourceTrigger=PropertyChanged,Delay=300,Mode=TwoWay}"></TextBox>
+                </DockPanel>
+                <DockPanel LastChildFill="True">
+                    <Label Content="编译器名: "></Label>
+                    <TextBox Text="{Binding gModel.gCompiler,UpdateSourceTrigger=PropertyChanged,Delay=300,Mode=TwoWay}"></TextBox>
+                </DockPanel>
+                <DockPanel ToolTip="配置1和配置2,是两种组织目录方案,自己个性化选择">
+                    <RadioButton VerticalAlignment="Center" Tag="1" GroupName="R2" Margin="0,0,2,0" IsChecked="True" Content="配置1" Click="RadioButton_Click"></RadioButton>
+                    <RadioButton VerticalAlignment="Center" Tag="0" GroupName="R2"  Content="配置2" Click="RadioButton_Click"></RadioButton>
+                    <Button Height="25" Command="{Binding gModel.gCreateStructDir}" Content="创建结构目录" Width="100" HorizontalAlignment="Right"></Button>
+                </DockPanel>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</Window>
