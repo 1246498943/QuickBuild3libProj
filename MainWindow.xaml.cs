@@ -22,7 +22,7 @@ namespace XPloteQuickBuidProj
     {
         public MainWindow()
         {
-            InitializeComponent();
+            InitializeComponent(); 
         }
     }
 }
