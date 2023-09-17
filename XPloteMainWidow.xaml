@@ -141,7 +141,9 @@
                         </GroupBox.Resources>
                         <Grid>
                             <ScrollViewer CanContentScroll="True" VerticalScrollBarVisibility="Auto">
-                                <ListBox HorizontalContentAlignment="Stretch" ScrollViewer.CanContentScroll="True" ScrollViewer.VerticalScrollBarVisibility="Auto" ItemsSource="{Binding gModel.gBuildModel.gSdkSource}"
+                                <ListBox HorizontalContentAlignment="Stretch" ScrollViewer.CanContentScroll="True" 
+                                         ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                         ItemsSource="{Binding gModel.gBuildModel.gSdkSource}"
                                      ItemTemplate="{StaticResource comPelierTemPlate}">
 
                                 </ListBox>

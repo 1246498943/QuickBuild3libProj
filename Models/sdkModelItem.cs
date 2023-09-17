@@ -292,4 +292,73 @@ namespace XPloteQuickBuidProj
     }
 
 
+
+    /// <summary>
+    ///创建一个整体的类 - 然后使用分组进行设置.
+    // 编译器名字 - 库名字(库名字+库版本: 需要解析) - Release/Debug - include/lib/dll - list<string> libs;
+    //这里信息，分离路径后->将之写入json文件中.
+    /// </summary>
+    public class DllSdkModel:PathDllItem
+    {
+        public DllSdkModel(string mName):base(mName) { }
+
+
+
+        /// <summary>
+        /// 是否选中.
+        /// </summary>
+        private bool? mIsChecked;
+        public bool? gIsChecked
+        {
+            get => mIsChecked;
+            set
+            {
+                if (mIsChecked != value)
+                {
+                    mIsChecked = value;
+                    this.OnPropertyChanged();
+                    GlobalSingleHelper.SendCheckStatus(this);
+
+                }
+            }
+        }
+
+        /// <summary>
+        /// 库描述
+        /// </summary>
+        private string? mDescript;
+        public string? gDescript
+        {
+            get => mDescript;
+            set
+            {
+                if (mDescript != value)
+                {
+                    mDescript = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
+        /// <summary>
+        /// 库的版本
+        /// </summary>
+        private string? mDllVersion;
+        public string? gDllVersion
+        {
+            get => mDllVersion;
+            set
+            {
+                if (mDllVersion != value)
+                {
+                    mDllVersion = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
+
+    }
+
+
 }
