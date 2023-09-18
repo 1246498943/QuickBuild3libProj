@@ -74,7 +74,7 @@ namespace XPloteQuickBuidProj
 				if (mVcxprojFile != value)
 				{
 					mVcxprojFile = value;
-					this.OnPropertyChanging();
+					this.OnPropertyChanged();
 				}
 			}
 		}
@@ -92,7 +92,7 @@ namespace XPloteQuickBuidProj
 				if (mIsCover != value)
 				{
 					mIsCover = value;
-					this.OnPropertyChanging();
+					this.OnPropertyChanged();
 				}
 			}
 		}

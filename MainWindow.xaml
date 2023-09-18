@@ -271,12 +271,13 @@
                 <GroupBox DockPanel.Dock="Right" VerticalAlignment="Center" Margin="10,2,0,0" >
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                         <CheckBox VerticalAlignment="Center" IsChecked="{Binding gMode.gBuildModel.gIsCover}" ToolTip="是否清空原vcxproj配置" Content="覆盖vcxproj原始内容?" Margin="10,0"></CheckBox>
+                        <Button Content="查阅写入内容" Command="{Binding gModel.gLookWriteContent}" Width="100" Margin="10,0"></Button>
                         <Button Content="构建" Command="{Binding gModel.gBuildAndWriteConfig2VCProj}" Width="100"></Button>
                     </StackPanel>
                 </GroupBox>
                 <Button Content="选择vcxproj文件" Command="{Binding gModel.gOpenCcProjFile}" DockPanel.Dock="Right" Margin="10,0,0,0" Width="100"></Button>
                 <Label Content="vcxproj路径: "></Label>
-                <TextBox Text="{Binding gModel.gBuildModel.gVcxprojFile}"></TextBox>
+                <TextBlock TextTrimming="CharacterEllipsis" ToolTip="{Binding gModel.gBuildModel.gVcxprojFile}" Text="{Binding gModel.gBuildModel.gVcxprojFile}"></TextBlock>
             </DockPanel>
         </Border>
         <Border Grid.Row="4">

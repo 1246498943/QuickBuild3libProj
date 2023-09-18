@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -69,7 +70,21 @@ namespace XPloteQuickBuidProj
         }
 
 
-		private dllItem mIncludeDir;
+        public string LibString()
+        {
+            return $"{gItemName}\\{mLibDir.gItemName}";
+        }
+        public string DllString()
+        {
+            return $"{gItemName}\\{mDllDir.gItemName}";
+        }
+        public string IncludeString()
+        {
+            return $"{gItemName}\\{mIncludeDir.gItemName}";
+        }
+
+
+        private dllItem mIncludeDir;
 		public dllItem gIncludeDir
 		{
 			get => mIncludeDir;
@@ -126,7 +141,7 @@ namespace XPloteQuickBuidProj
                 if (mIsChecked != value)
                 {
                     mIsChecked = value;
-                    this.OnPropertyChanging();
+                    this.OnPropertyChanged();
                     GlobalSingleHelper.SendCheckStatus(mIsChecked);
                 }
             }
@@ -146,6 +161,32 @@ namespace XPloteQuickBuidProj
             mRelease = new DebugReleaseDllItem("Release");
         }
 
+        public string Platform_Debug_Lib_String()
+        {
+            return $"{gItemName}\\{mDebug.LibString()}";
+        }
+        public string Platform_Debug_Dll_String()
+        {
+            return $"{gItemName}\\{mDebug.DllString()}";
+        }
+        public string Platform_Debug_Include_String()
+        {
+            return $"{gItemName}\\{mDebug.IncludeString()}";
+        }
+
+        public string Platform_Release_Lib_String()
+        {
+            return $"{gItemName}\\{mDebug.LibString()}";
+        }
+        public string Platform_Release_Dll_String()
+        {
+            return $"{gItemName}\\{mDebug.DllString()}";
+        }
+        public string Platform_Release_Include_String()
+        {
+            return $"{gItemName}\\{mDebug.IncludeString()}";
+        }
+
 
         private DebugReleaseDllItem mDebug;
         public DebugReleaseDllItem gDebug
@@ -156,7 +197,7 @@ namespace XPloteQuickBuidProj
                 if (mDebug != value)
                 {
                     mDebug = value;
-                    this.OnPropertyChanging();
+                    this.OnPropertyChanged();
                 }
             }
         }
@@ -186,7 +227,7 @@ namespace XPloteQuickBuidProj
                 if (mIsChecked != value)
                 {
                     mIsChecked = value;
-                    this.OnPropertyChanging();
+                    this.OnPropertyChanged();
                     GlobalSingleHelper.SendCheckStatus(mIsChecked);
                 }
             }
@@ -212,6 +253,57 @@ namespace XPloteQuickBuidProj
             mDll64 = new X64Or32DllItem("x64");
         }
 
+        public string DllName_64_Debug_Lib_String()
+        {
+            return $"{gItemName}\\{mDll64.Platform_Debug_Lib_String()}";
+        }
+        public string DllName_64__Debug_Dll_String()
+        {
+            return $"{gItemName}\\{mDll64.Platform_Debug_Dll_String()}";
+        }
+        public string DllName_64__Debug_Include_String()
+        {
+            return $"{gItemName}\\{mDll64.Platform_Debug_Include_String()}";
+        }
+
+        public string DllName_64_Release_Lib_String()
+        {
+            return $"{gItemName}\\{mDll64.Platform_Release_Lib_String()}";
+        }
+        public string DllName_64__Release_Dll_String()
+        {
+            return $"{gItemName}\\{mDll64.Platform_Release_Dll_String()}";
+        }
+        public string DllName_64__Release_Include_String()
+        {
+            return $"{gItemName}\\{mDll64.Platform_Release_Include_String()}";
+        }
+
+        public string DllName_32_Debug_Lib_String()
+        {
+            return $"{gItemName}\\{mDll32.Platform_Debug_Lib_String()}";
+        }
+        public string DllName_32__Debug_Dll_String()
+        {
+            return $"{gItemName}\\{mDll32.Platform_Debug_Dll_String()}";
+        }
+        public string DllName_32__Debug_Include_String()
+        {
+            return $"{gItemName}\\{mDll32.Platform_Debug_Include_String()}";
+        }
+
+        public string DllName_32_Release_Lib_String()
+        {
+            return $"{gItemName}\\{mDll32.Platform_Release_Lib_String()}";
+        }
+        public string DllName_32__Release_Dll_String()
+        {
+            return $"{gItemName}\\{mDll32.Platform_Release_Dll_String()}";
+        }
+        public string DllName_32__Release_Include_String()
+        {
+            return $"{gItemName}\\{mDll32.Platform_Release_Include_String()}";
+        }
         /// <summary>
         /// 库的版本
         /// </summary>

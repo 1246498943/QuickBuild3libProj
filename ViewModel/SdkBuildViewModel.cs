@@ -102,8 +102,11 @@ namespace XPloteQuickBuidProj
 
         //读取c++文件,并解析重新写入
         public ICommand gOpenCcProjFile { get; set; }//读取vcProj配置文件.
+
+        public ICommand gLookWriteContent { get; set; }
         public ICommand gBuildAndWriteConfig2VCProj { get; set; }//构建VcProj配置项目.
 
+        private ShowContent? mShowContentWnd { get; set; }
 
 
         private sdkCreateDirModel mCreateDirModel;
@@ -226,13 +229,76 @@ namespace XPloteQuickBuidProj
             
             });
 
+            gLookWriteContent = new RelayCommand(() => {
+
+                if(mShowContentWnd==null)
+                {
+                    mShowContentWnd = new ShowContent();
+                }
+
+                //设置内容.
+                var curStr = GetWriteContentSt();
+                mShowContentWnd.SetContentStr(curStr);
+                mShowContentWnd.ShowWnd();
+
+            });
+
+
             gBuildAndWriteConfig2VCProj = new RelayCommand(() => { 
             
             
             
             });
 
+   
 
+        }
+
+        private string GetWriteContentSt()
+        {
+            //分层4组: 
+            //opencv/
+            //x64/Debug/include + lib + dll;
+            //x64/Release/include + lib + dll;
+            //x32/Debug/include + lib + dll;
+            //x32/Release/include + lib + dll;
+            //string libStr_Debug = "", includeStr_Debug = "", dllStr_Debug = ""
+            //    ,;
+
+            string[] StrDes = new string[12];
+
+            foreach (var sdkItem in gBuildModel?.gBuildSdkSource)
+            {
+                //64/debug/
+                StrDes[0]+=$"{sdkItem.DllName_64_Debug_Lib_String()};\r\n";
+                StrDes[1]+=$"{sdkItem.DllName_64__Debug_Dll_String()};\r\n";
+                StrDes[2]+=$"{sdkItem.DllName_64__Debug_Include_String()};\r\n";
+
+                //64/Release/
+                StrDes[3]+=$"{sdkItem.DllName_64_Release_Lib_String()};\r\n";
+                StrDes[4]+=$"{sdkItem.DllName_64__Release_Dll_String()};\r\n";
+                StrDes[5]+=$"{sdkItem.DllName_64__Release_Include_String()};\r\n";
+
+
+                StrDes[6]+=$"{sdkItem.DllName_32_Debug_Lib_String()};\r\n";
+                StrDes[7]+=$"{sdkItem.DllName_32__Debug_Dll_String()};\r\n";
+                StrDes[8]+=$"{sdkItem.DllName_32__Debug_Include_String()};\r\n";
+
+                StrDes[9]+=$"{sdkItem.DllName_32_Release_Lib_String()};\r\n";
+                StrDes[10]+=$"{sdkItem.DllName_32__Release_Dll_String()};\r\n";
+                StrDes[11]+=$"{sdkItem.DllName_32__Release_Include_String()};\r\n";
+
+            }
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < StrDes.Length; i++)
+            {
+                if(i>0 && i%3==0)
+                {
+                    sb.AppendLine($"{"----------------------------------"}\r\n\r\n");
+                }
+                sb.AppendLine(StrDes[i]);
+            }
+            return sb.ToString();
         }
 
         private void ReadConfigFileFromHistory()

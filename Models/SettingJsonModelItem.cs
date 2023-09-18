@@ -27,7 +27,7 @@ namespace XPloteQuickBuidProj
 				if (mFileName != value)
 				{
 					mFileName = value;
-					this.OnPropertyChanging();
+					this.OnPropertyChanged();
 				}
 			}
 		}
@@ -44,7 +44,7 @@ namespace XPloteQuickBuidProj
 				if (mFilePath != value)
 				{
 					mFilePath = value;
-					this.OnPropertyChanging();
+					this.OnPropertyChanged();
 				}
 			}
 		}
