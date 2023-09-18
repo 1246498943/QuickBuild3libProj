@@ -12,6 +12,8 @@ using XPloteQuickBuidProj.Views;
 using System.Windows.Forms;
 using System.IO;
 using System.Windows.Shapes;
+using Microsoft.Xaml.Behaviors.Core;
+using System.Collections.ObjectModel;
 
 namespace XPloteQuickBuidProj
 {
@@ -24,34 +26,52 @@ namespace XPloteQuickBuidProj
         public SdkBuildViewModel()
         {
             gBuildModel = new sdkBuildModel();
-            gCreateDirModel = new sdkCreateDirModel();
+            gCreateDirModel = new sdkCreateDirModel();//创建文件夹.
             InitCommands();
             GlobalSingleHelper.SendCheckHandler+=GlobalSingleHelper_SendCheckHandler;
         }
 
-        private void GlobalSingleHelper_SendCheckHandler(sdkModelItem obj)
+
+        private void UpdateSdkDllLists()
+        {
+            if (gBuildModel != null)
+            {
+                gBuildModel.ClearnSkModelItems();
+                var compelierLists = gBuildModel.gCompelierSource;
+                foreach (var compeLierItem in compelierLists) 
+                {
+                    foreach (var sdkItem in compeLierItem.gSdkItemList)
+                    {
+                        if(sdkItem.gIsChecked==true)
+                        {
+                            gBuildModel.AddSdkModelItem(sdkItem);
+                        }
+                    }
+                }
+            }
+        }
+
+        private void GlobalSingleHelper_SendCheckHandler(bool? obj)
         {
             //一些关键信号触发的时候,在这里检测
-            if (obj!=null)
-            {
-                if (obj.gIsChecked==true)
-                {
-
-                }
-                else
-                {
-
-                }
-
-            }
+            UpdateSdkDllLists();
         }
 
         public ICommand? gSetSdkDir { get; set; }      //设置目录.
         public ICommand? gImportSdk2List { get; set; } //导入库
         public ICommand? gCreateStructDirs { get; set; }//在当前的Dir下,创建新的结构目录.
 
+        public ICommand? gImportSettingConfig { get; set; }//导入配置文件.
+        public ICommand? gCheckIsSucessSetConfig { get; set; }//校验配置文件,将配置文件中-sdk目录中的比较,不符合的,设置层红色.
+
+        public ICommand? gSaveSettingConfig { get; set; }//保存并导出配置文件.
+
+        public ICommand? gShowSettingManageWnd { get; set; }//打开配置文件管理器窗口,进行配置文件快速加载.
 
 
+        public ICommand? IReUpdate { get; set; }//重新从文件夹中读取文件数据.并将数据加载将来.
+        public ICommand? IReadFileHistory { get; set; }
+     
 
         private sdkBuildModel mBuildModel;
 
@@ -70,6 +90,19 @@ namespace XPloteQuickBuidProj
                 }
             }
         }
+
+        /// <summary>
+        /// 历史配置.
+        /// </summary>
+        public ObservableCollection<SettingJsonModelItem> gJsonLists { get; set; } = new ObservableCollection<SettingJsonModelItem>();
+        public SettingJsonModelItem gSelectedJsonModelItem { get; set; }
+
+        private  SettingHistory? mSetHistoryWnd { get; set; }
+
+
+        //读取c++文件,并解析重新写入
+        public ICommand gOpenCcProjFile { get; set; }//读取vcProj配置文件.
+        public ICommand gBuildAndWriteConfig2VCProj { get; set; }//构建VcProj配置项目.
 
 
 
@@ -113,6 +146,134 @@ namespace XPloteQuickBuidProj
                 mCreateDirWnd.ShowWnd();
 
             });
+
+            gImportSettingConfig = new RelayCommand(() => {
+
+                ReadConfigFileFromDialog();
+            });
+
+            gSaveSettingConfig = new RelayCommand(() => {
+
+                //写入数据到文件中.
+                var curSettingFilePath = $"{gBuildModel.gSettingPath}{gBuildModel.gSettingName}.xml";
+                GlobalGetErrorHelper.GetError(() => {
+
+                    var dataList = gBuildModel.gBuildSdkSource;
+                    if (dataList != null && dataList.Count>0)
+                    {
+                        JsonSerialFileHelper.Write2File(dataList, curSettingFilePath);
+                    }
+                    else
+                    {
+                        throw new Exception("数据为空,导出失败");
+                    }
+
+                },$"导出文件 {curSettingFilePath}");
+           
+            });
+
+            //////////////历史
+            ///刷新文件夹.
+            IReUpdate = new RelayCommand(() => {
+
+                gJsonLists.Clear();
+                var curJsonDir = XPloteQucikConfigs.CurSettingDir;
+                var curJsonFiles = System.IO.Directory.GetFiles(curJsonDir, "", System.IO.SearchOption.AllDirectories);
+                foreach (var file in curJsonFiles)
+                {
+                    SettingJsonModelItem jsonModel = new SettingJsonModelItem();
+                    jsonModel.gFilePath = file;
+                    jsonModel.gFileName = System.IO.Path.GetFileNameWithoutExtension(file);
+                    var dataList = JsonSerialFileHelper.ReadDataFromFile<ObservableCollection<sdkModelItem>>(file);
+                    jsonModel.gSdkModelLists = dataList;
+                    gJsonLists.Add(jsonModel);
+                }
+            });
+
+
+            IReadFileHistory = new RelayCommand(() => {
+
+                ReadConfigFileFromHistory();
+            });
+
+            gShowSettingManageWnd = new RelayCommand(() => { 
+            
+                if(mSetHistoryWnd==null)
+                {
+                    mSetHistoryWnd = new SettingHistory();
+                }
+                mSetHistoryWnd.ShowWnd();
+
+
+            });
+
+
+            //c++构建
+
+            //获取文件路径....
+            gOpenCcProjFile = new RelayCommand(() => {
+
+                GlobalGetErrorHelper.GetError(() => { 
+                
+                OpenFileDialog openFileDialog = new OpenFileDialog();
+                    openFileDialog.Filter = "*.vcxproj|*.vcxproj|*.*|*.*";
+                    if(openFileDialog.ShowDialog()== DialogResult.OK)
+                    {
+                        gBuildModel.gVcxprojFile = openFileDialog.FileName;
+                    }
+                
+                });
+            
+            });
+
+            gBuildAndWriteConfig2VCProj = new RelayCommand(() => { 
+            
+            
+            
+            });
+
+
+        }
+
+        private void ReadConfigFileFromHistory()
+        {
+
+            if(gSelectedJsonModelItem!=null)
+            {
+                var curFile = gSelectedJsonModelItem.gFilePath;
+                ReadConfigFileFromFile(curFile);
+                //更新配置文件名字.
+                gBuildModel.gSettingName = System.IO.Path.GetFileNameWithoutExtension(curFile);
+            }
+
+        }
+
+        private void ReadConfigFileFromFile(string curFile)
+        {
+
+            GlobalGetErrorHelper.GetError(() => {
+
+                var datalist = JsonSerialFileHelper.ReadDataFromFile<ObservableCollection<sdkModelItem>>(curFile);
+                gBuildModel.ClearnSkModelItems();
+                foreach (var item in datalist)
+                {
+                    gBuildModel.AddSdkModelItem(item);
+                   
+                }
+            });
+            
+        }
+
+        private void ReadConfigFileFromDialog()
+        {
+            //打开文件夹.
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.Filter = "*.xml|*.xml";
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                var curFile = openFileDialog.FileName;
+                ReadConfigFileFromFile(curFile);
+            }
         }
 
 
@@ -144,7 +305,7 @@ namespace XPloteQuickBuidProj
             var curSdkDir = gBuildModel.gSdkDir;
             if (curSdkDir == null) return;
 
-            var curDllSourceList = gBuildModel?.gSdkSource;
+            var curDllSourceList = gBuildModel?.gCompelierSource;
             curDllSourceList?.Clear();
 
             ///从一个路径中,返回最后的文件夹名字.

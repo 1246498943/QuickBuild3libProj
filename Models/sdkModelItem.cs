@@ -7,11 +7,13 @@ using System.Threading.Tasks;
 using CommunityToolkit.Mvvm;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.WindowsAPICodePack.Dialogs.Controls;
+using Newtonsoft.Json;
 
 namespace XPloteQuickBuidProj
 {
-   
-	public class PathDllItem:ObservableObject
+    [Serializable]
+    [JsonObject(MemberSerialization.OptOut)]
+    public class PathDllItem:ObservableObject
 	{
 
 		public PathDllItem(string mName)
@@ -36,7 +38,8 @@ namespace XPloteQuickBuidProj
 
 	}
 
-
+    [Serializable]
+    [JsonObject(MemberSerialization.OptOut)]
     /// <summary>
     /// 而整个模块,却是包含一些具体的文件内容.
     /// </summary>
@@ -54,7 +57,9 @@ namespace XPloteQuickBuidProj
 
     }
 
-	public class DebugReleaseDllItem: PathDllItem
+    [Serializable]
+    [JsonObject(MemberSerialization.OptOut)]
+    public class DebugReleaseDllItem: PathDllItem
     {
 		public DebugReleaseDllItem(string mName):base(mName)
 		{
@@ -122,6 +127,7 @@ namespace XPloteQuickBuidProj
                 {
                     mIsChecked = value;
                     this.OnPropertyChanging();
+                    GlobalSingleHelper.SendCheckStatus(mIsChecked);
                 }
             }
         }
@@ -130,7 +136,9 @@ namespace XPloteQuickBuidProj
 
     }
 
-	public class X64Or32DllItem: PathDllItem
+    [Serializable]
+    [JsonObject(MemberSerialization.OptOut)]
+    public class X64Or32DllItem: PathDllItem
     {
 		public X64Or32DllItem(string mName):base(mName) 
         {
@@ -179,6 +187,7 @@ namespace XPloteQuickBuidProj
                 {
                     mIsChecked = value;
                     this.OnPropertyChanging();
+                    GlobalSingleHelper.SendCheckStatus(mIsChecked);
                 }
             }
         }
@@ -190,11 +199,16 @@ namespace XPloteQuickBuidProj
 
 
     */
+    [Serializable]
+    [JsonObject(MemberSerialization.OptOut)]
     public class sdkModelItem : PathDllItem
     {
+
+
         public sdkModelItem(string mName):base(mName)
         {
             mDll32 = new X64Or32DllItem("x32");
+            mDll32.gIsChecked = false;
             mDll64 = new X64Or32DllItem("x64");
         }
 
@@ -229,7 +243,7 @@ namespace XPloteQuickBuidProj
                 {
                     mIsChecked = value;
                     this.OnPropertyChanged();
-                    GlobalSingleHelper.SendCheckStatus(this);
+                    GlobalSingleHelper.SendCheckStatus(mIsChecked);
 
                 }
             }
@@ -282,83 +296,20 @@ namespace XPloteQuickBuidProj
         }
     }
 
+    [Serializable]
+    [JsonObject(MemberSerialization.OptOut)]
     public class CompelierItem: PathDllItem
     {
         public CompelierItem(string mName):base(mName) 
         {
             gSdkItemList = new ObservableCollection<sdkModelItem>();
-        }  
+        }
+        public sdkModelItem gCurSdkModelItem { get; set; }
         public ObservableCollection<sdkModelItem> gSdkItemList { get; set; }
-    }
-
-
-
-    /// <summary>
-    ///创建一个整体的类 - 然后使用分组进行设置.
-    // 编译器名字 - 库名字(库名字+库版本: 需要解析) - Release/Debug - include/lib/dll - list<string> libs;
-    //这里信息，分离路径后->将之写入json文件中.
-    /// </summary>
-    public class DllSdkModel:PathDllItem
-    {
-        public DllSdkModel(string mName):base(mName) { }
-
-
-
-        /// <summary>
-        /// 是否选中.
-        /// </summary>
-        private bool? mIsChecked;
-        public bool? gIsChecked
-        {
-            get => mIsChecked;
-            set
-            {
-                if (mIsChecked != value)
-                {
-                    mIsChecked = value;
-                    this.OnPropertyChanged();
-                    GlobalSingleHelper.SendCheckStatus(this);
-
-                }
-            }
-        }
-
-        /// <summary>
-        /// 库描述
-        /// </summary>
-        private string? mDescript;
-        public string? gDescript
-        {
-            get => mDescript;
-            set
-            {
-                if (mDescript != value)
-                {
-                    mDescript = value;
-                    this.OnPropertyChanged();
-                }
-            }
-        }
-
-        /// <summary>
-        /// 库的版本
-        /// </summary>
-        private string? mDllVersion;
-        public string? gDllVersion
-        {
-            get => mDllVersion;
-            set
-            {
-                if (mDllVersion != value)
-                {
-                    mDllVersion = value;
-                    this.OnPropertyChanged();
-                }
-            }
-        }
 
 
     }
+
 
 
 }

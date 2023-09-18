@@ -15,9 +15,9 @@ namespace XPloteQuickBuidProj
         /// <summary>
         /// 发送某个对象的一些全局信号对象.
         /// </summary>
-        public static event Action<sdkModelItem>? SendCheckHandler;
+        public static event Action<bool?>? SendCheckHandler;
 
-        public static void SendCheckStatus(sdkModelItem model)
+        public static void SendCheckStatus(bool? model)
         {
             if(SendCheckHandler!=null)
             {
@@ -25,5 +25,13 @@ namespace XPloteQuickBuidProj
             }
         }
 
+        public static event Action<string?>? SendLogInfoHandler;
+        public static void SendLogInfo(string? str)
+        {
+            if(SendLogInfoHandler!=null)
+            {
+                SendLogInfoHandler(str);
+            }
+        }
     }
 }
