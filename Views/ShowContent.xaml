@@ -6,9 +6,31 @@
         xmlns:local="clr-namespace:XPloteQuickBuidProj.Views"
         mc:Ignorable="d"
         Title="写入vcxProj的内容" Height="450" Width="800">
+    <Window.Resources>
+        <Style TargetType="{x:Type TabItem}" BasedOn="{StaticResource MaterialDesignTabItem}">
+        </Style>
+        <Style TargetType="{x:Type TabControl}" BasedOn="{StaticResource MaterialDesignTabControl}">
+           
+        </Style>
+        <!--<Style TargetType="{x:Type TabItem}">
+            <Setter Property="Margin" Value="5,0,5,1"></Setter>
+            <Setter Property="Width" Value="100"></Setter>
+            <Setter Property="BorderThickness" Value="0,0,0,2"></Setter>
+            <Setter Property="BorderBrush" Value="Gray"></Setter>
+        </Style>-->
+    </Window.Resources>
     <Grid>
-        <ScrollViewer VerticalScrollBarVisibility="Auto">
-            <TextBox ScrollViewer.CanContentScroll="True" x:Name="FlowDocumentName"></TextBox>
-        </ScrollViewer>
+        <TabControl x:Name="TabControlName">
+            <TabItem Header="写入的内容" >
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <TextBox ScrollViewer.CanContentScroll="True" TextWrapping="Wrap" x:Name="FlowDocumentName"></TextBox>
+                </ScrollViewer>
+            </TabItem>
+            <TabItem Header="写入之后的内容">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <TextBox ScrollViewer.CanContentScroll="True" TextWrapping="Wrap" x:Name="vcxProjContentName"></TextBox>
+                </ScrollViewer>
+            </TabItem>
+        </TabControl>
     </Grid>
 </Window>

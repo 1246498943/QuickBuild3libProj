@@ -35,7 +35,14 @@ namespace XPloteQuickBuidProj
         public void SetContentStr(string str)
         {
             FlowDocumentName.Text = str;
+            TabControlName.SelectedIndex = 0;
         }
+        public void SetVcxProjContentStr(string str)
+        {
+            vcxProjContentName.Text = str;
+            TabControlName.SelectedIndex = 1;
+        }
+        
 
         protected override void OnClosing(CancelEventArgs e)
         {

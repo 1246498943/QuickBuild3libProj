@@ -14,6 +14,9 @@ using System.IO;
 using System.Windows.Shapes;
 using Microsoft.Xaml.Behaviors.Core;
 using System.Collections.ObjectModel;
+using System.Xml;
+using System.Xml.Linq;
+using System.Windows;
 
 namespace XPloteQuickBuidProj
 {
@@ -244,16 +247,218 @@ namespace XPloteQuickBuidProj
             });
 
 
-            gBuildAndWriteConfig2VCProj = new RelayCommand(() => { 
-            
-            
-            
+            gBuildAndWriteConfig2VCProj = new RelayCommand(() => {
+
+
+                var content = ReadVcxProj(gBuildModel.gVcxprojFile);
+
+                //解析内容.
+
+
+                if (mShowContentWnd==null)
+                {
+                    mShowContentWnd = new ShowContent();
+                }
+                //设置内容.
+                var curStr = GetWriteContentSt();
+                mShowContentWnd.SetVcxProjContentStr(content);
+                mShowContentWnd.ShowWnd();
+
             });
 
    
 
         }
 
+
+        private string ReadVcxProj(string vcxProjFile)
+        {
+
+            StringBuilder sb = new StringBuilder();
+
+            GlobalGetErrorHelper.GetError(() => {
+                // 创建一个 XmlDocument 对象
+                XmlDocument doc = new XmlDocument();
+                // 加载 vcxproj 文件
+                doc.Load(vcxProjFile);
+                // 获取根元素 Project
+                XmlElement root = doc.DocumentElement;
+                // 遍历 Project 的子节点
+                foreach (XmlNode node in root.ChildNodes)
+                {
+                    // 输出节点的名称
+                    Console.WriteLine("Module: {0}", node.Name);
+                    // 输出节点的内容
+                    Console.WriteLine("Content: {0}", node.InnerXml);
+                    // 输出空行
+                    Console.WriteLine();
+
+                    // 判断节点是否是 ItemDefinitionGroup 元素
+                    if (node.Name == "ItemDefinitionGroup")
+                    {
+                        // 获取节点的 Condition 属性
+                        string condition = node.Attributes["Condition"].Value; //输出 Condition 属性的值
+                        Console.WriteLine("Condition: {0}", condition);//判断 Condition 属性是否等于 "'$(Configuration)|$(Platform)'=='Debug|x64'"
+                        if (condition == "'$(Configuration)|$(Platform)'=='Debug|x64'")
+                        {
+                            sb.AppendLine("添加 -------- Debug| x64");
+                            //到这一步,获取到ClCompile + Link 两个子节点.
+
+                            //从这两个子节点中:clCompile AdditionalIncludeDirectories (include文件夹) 
+
+                            //Line: AdditionalLibraryDirectories (lib文件夹) + AdditionalDependencies (输入依赖项)
+
+                            //Console.WriteLine("Content: {0}", node.InnerXml);
+                            //Console.WriteLine();
+
+                            //sb.AppendLine(node.Name);
+                            //sb.AppendLine(node.InnerXml);
+                            if(node.HasChildNodes==true)
+                            {
+                                foreach (XmlNode nodeItem in node.ChildNodes)
+                                {
+                              
+                                    if (nodeItem.Name == "ClCompile")
+                                    {
+                                        sb.AppendLine(nodeItem.Name);
+                                        nodeItem.InnerText+=";改变内容;";
+                                        sb.AppendLine(nodeItem.InnerText);
+
+                                    }
+                                    else if (nodeItem.Name == "Link")
+                                    {
+                                        sb.AppendLine(nodeItem.Name);
+                                        if(nodeItem.HasChildNodes)
+                                        {
+                                            foreach (XmlNode node2 in nodeItem.ChildNodes)
+                                            {
+                                                sb.AppendLine(node2.Name);
+                                                sb.AppendLine(node2.InnerText);
+                                            }
+                                        }
+                                      
+                                    }
+                                }
+                            }
+
+                        }
+                        else if (condition == "'$(Configuration)|$(Platform)'=='Release|x64'")
+                        {
+                            sb.AppendLine("添加 -------- Release| x64");
+                        }
+                        else if (condition == "'$(Configuration)|$(Platform)'=='Debug|Win32'")
+                        {
+                            sb.AppendLine("添加 -------- Debug|Win32");
+                        }
+                        else if (condition == "'$(Configuration)|$(Platform)'=='Release|Win32'")
+                        {
+                            sb.AppendLine("添加 -------- Release|Win32");
+                        }
+                    }
+
+                  
+                }
+
+            });
+            return sb.ToString();
+        }
+
+        private string ReadVcxProj3(string vcxProjFile)
+        {
+
+            StringBuilder sb = new StringBuilder();
+
+            GlobalGetErrorHelper.GetError(() => {
+                // 创建一个 XmlDocument 对象
+                XmlDocument doc = new XmlDocument();
+                // 加载 vcxproj 文件
+                doc.Load(vcxProjFile);
+                // 获取根元素 Project
+                XmlElement root = doc.DocumentElement;
+                // 遍历 Project 的子节点
+
+
+                ExtractNode(root,"",sb);
+
+            });
+            return sb.ToString();
+        }
+
+        static void ExtractNode(XmlNode node, string indent,StringBuilder sb)
+        {
+            // 输出缩进符和节点的名称
+            Console.WriteLine("{0}Name: {1}", indent, node.Name);
+            sb.AppendLine($"{indent}Name: {node.Name}");
+            // 判断节点是否有属性
+            if (node.Attributes != null)
+            {
+                // 遍历节点的属性
+                foreach (XmlAttribute attr in node.Attributes)
+                {
+                    // 输出缩进符和属性的名称和值
+                    Console.WriteLine("{0}Attribute: {1} = {2}", indent, attr.Name, attr.Value);
+                    sb.AppendLine($"{indent}Attribute: {attr.Name} = {attr.Value}");
+                }
+            }
+            // 判断节点是否有文本内容
+            if (node.InnerText != "" && node.InnerText != node.InnerXml)
+            {
+                // 输出缩进符和节点的文本内容
+                Console.WriteLine("{0}Text: {1}", indent, node.InnerText);
+                sb.AppendLine($"{indent}Text: {node.InnerText}");
+            }
+            // 判断节点是否有子节点
+            if (node.HasChildNodes)
+            {
+                // 遍历节点的子节点
+                foreach (XmlNode child in node.ChildNodes)
+                {
+                    // 调用 ExtractNode 方法，传入子节点和增加一个制表符的缩进符作为参数
+                    ExtractNode(child, indent + "\t", sb);
+                }
+            }
+        }
+
+        public enum linkType : int
+        {
+            x64_debug_lib = 0,
+            x64_debug_dll,
+            x64_debug_include,
+            x64_debug_liblists,
+
+            x64_release_lib,
+            x64_release_dll,
+            x64_release_include,
+            x64_release_liblists,
+
+            x32_debug_lib,
+            x32_debug_dll,
+            x32_debug_include,
+            x32_debug_liblists,
+
+            x32_release_lib,
+            x32_release_dll,
+            x32_release_include,
+            x32_release_liblists,
+
+            link_numbers
+
+        }
+
+        /// <summary>
+        /// 获取link的内容.
+        /// </summary>
+        /// <param name="mtype"></param>
+        /// <returns></returns>
+        private string GetLinkStr(linkType mtype)
+        {
+            return SdkStrDes[(int)mtype];
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private string[] SdkStrDes = new string[16];
         private string GetWriteContentSt()
         {
             //分层4组: 
@@ -264,8 +469,11 @@ namespace XPloteQuickBuidProj
             //x32/Release/include + lib + dll;
             //string libStr_Debug = "", includeStr_Debug = "", dllStr_Debug = ""
 
-
-            string[] StrDes = new string[16];
+            for (int i = 0; i < SdkStrDes.Length; i++)
+            {
+                SdkStrDes[i] = "";
+            }
+            
             foreach (var sdkItem in gBuildModel?.gBuildSdkSource)
             {
                 //64/debug/
@@ -273,23 +481,23 @@ namespace XPloteQuickBuidProj
                 {
                     if(sdkItem.gDll64.gDebug.gIsChecked==true)
                     {
-                        StrDes[0]+=$"{sdkItem.DllName_64_Debug_Lib_String()};\r\n";
-                        StrDes[1]+=$"{sdkItem.DllName_64__Debug_Dll_String()};\r\n";
-                        StrDes[2]+=$"{sdkItem.DllName_64__Debug_Include_String()};\r\n";
+                        SdkStrDes[0]+=$"{sdkItem.DllName_64_Debug_Lib_String()};\r\n";
+                        SdkStrDes[1]+=$"{sdkItem.DllName_64__Debug_Dll_String()};\r\n";
+                        SdkStrDes[2]+=$"{sdkItem.DllName_64__Debug_Include_String()};\r\n";
                         foreach (var libName in sdkItem.gDll64.gDebug.gLibDir.gLibSources)
                         {
-                            StrDes[3]+=$"{libName}\r\n";
+                            SdkStrDes[3]+=$"{libName}\r\n";
                         }
                     }
                     if(sdkItem.gDll64.gRelease.gIsChecked==true)
                     {
                         //64/Release/
-                        StrDes[4]+=$"{sdkItem.DllName_64_Release_Lib_String()};\r\n";
-                        StrDes[5]+=$"{sdkItem.DllName_64__Release_Dll_String()};\r\n";
-                        StrDes[6]+=$"{sdkItem.DllName_64__Release_Include_String()};\r\n";
+                        SdkStrDes[4]+=$"{sdkItem.DllName_64_Release_Lib_String()};\r\n";
+                        SdkStrDes[5]+=$"{sdkItem.DllName_64__Release_Dll_String()};\r\n";
+                        SdkStrDes[6]+=$"{sdkItem.DllName_64__Release_Include_String()};\r\n";
                         foreach (var libName in sdkItem.gDll64.gRelease.gLibDir.gLibSources)
                         {
-                            StrDes[7]+=$"{libName}\r\n";
+                            SdkStrDes[7]+=$"{libName}\r\n";
                         }
                     }
 
@@ -300,23 +508,23 @@ namespace XPloteQuickBuidProj
                     if(sdkItem.gDll32.gDebug.gIsChecked==true)
                     {
 
-                        StrDes[8]+=$"{sdkItem.DllName_32_Debug_Lib_String()};\r\n";
-                        StrDes[9]+=$"{sdkItem.DllName_32__Debug_Dll_String()};\r\n";
-                        StrDes[10]+=$"{sdkItem.DllName_32__Debug_Include_String()};\r\n";
+                        SdkStrDes[8]+=$"{sdkItem.DllName_32_Debug_Lib_String()};\r\n";
+                        SdkStrDes[9]+=$"{sdkItem.DllName_32__Debug_Dll_String()};\r\n";
+                        SdkStrDes[10]+=$"{sdkItem.DllName_32__Debug_Include_String()};\r\n";
                         foreach (var libName in sdkItem.gDll32.gDebug.gLibDir.gLibSources)
                         {
-                            StrDes[11]+=$"{libName}\r\n";
+                            SdkStrDes[11]+=$"{libName}\r\n";
                         }
 
                     }
                     if (sdkItem.gDll32.gRelease.gIsChecked==true)
                     {
-                        StrDes[12]+=$"{sdkItem.DllName_32_Release_Lib_String()};\r\n";
-                        StrDes[13]+=$"{sdkItem.DllName_32__Release_Dll_String()};\r\n";
-                        StrDes[14]+=$"{sdkItem.DllName_32__Release_Include_String()};\r\n";
+                        SdkStrDes[12]+=$"{sdkItem.DllName_32_Release_Lib_String()};\r\n";
+                        SdkStrDes[13]+=$"{sdkItem.DllName_32__Release_Dll_String()};\r\n";
+                        SdkStrDes[14]+=$"{sdkItem.DllName_32__Release_Include_String()};\r\n";
                         foreach (var libName in sdkItem.gDll32.gRelease.gLibDir.gLibSources)
                         {
-                            StrDes[15]+=$"{libName}\r\n";
+                            SdkStrDes[15]+=$"{libName}\r\n";
                         }
                     }
                 }
@@ -330,7 +538,7 @@ namespace XPloteQuickBuidProj
             };
 
             StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < StrDes.Length; i++)
+            for (int i = 0; i < SdkStrDes.Length; i++)
             {
                 switch (i)
                 {
@@ -357,7 +565,7 @@ namespace XPloteQuickBuidProj
                     default:
                         break;
                 }
-                sb.AppendLine(StrDes[i]);
+                sb.AppendLine(SdkStrDes[i]);
             }
             return sb.ToString();
         }
