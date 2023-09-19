@@ -27,21 +27,20 @@
             <Style TargetType="{x:Type ListBox}">
                 <Setter Property="BorderThickness" Value="0"></Setter>
             </Style>
+            <Style TargetType="{x:Type Expander}" BasedOn="{StaticResource MaterialDesignExpander}"></Style>
             <Style TargetType="{x:Type TreeView}">
                 <Setter Property="BorderThickness" Value="0"></Setter>
             </Style>
-                <DataTemplate DataType="{x:Type local:dllItem}" x:Key="dllItemTemplate">
-                    <Grid Margin="10,0">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition MinWidth="80"></ColumnDefinition>
-                            <ColumnDefinition></ColumnDefinition>
-                        </Grid.ColumnDefinitions>
-                        <TextBlock Text="{Binding gItemName}" VerticalAlignment="Center" DockPanel.Dock="Left" Margin="10,0"></TextBlock>
-                        <TextBlock Grid.Column="1" Text="{Binding gLibSources.Count}"></TextBlock>
-                    </Grid>
-                </DataTemplate>
-
-     
+            <DataTemplate DataType="{x:Type local:dllItem}" x:Key="dllItemTemplate">
+                <Grid Margin="10,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition MinWidth="80"></ColumnDefinition>
+                        <ColumnDefinition></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="{Binding gItemName}" VerticalAlignment="Center" DockPanel.Dock="Left" Margin="10,0"></TextBlock>
+                    <TextBlock Grid.Column="1" Text="{Binding gLibSources.Count}"></TextBlock>
+                </Grid>
+            </DataTemplate>
             <DataTemplate DataType="{x:Type local:DebugReleaseDllItem}" x:Key="DebugReleaseTemplate2">
                 <GroupBox Margin="15,0">
                     <GroupBox.Header>
@@ -50,7 +49,7 @@
                             <TextBlock Text="{Binding gItemName}"></TextBlock>
                         </StackPanel>
                     </GroupBox.Header>
-                    <ListBox Margin="30,0" HorizontalAlignment="Stretch">
+                    <ListBox Margin="30,0" HorizontalAlignment="Stretch" ScrollViewer.VerticalScrollBarVisibility="Disabled">
                         <UserControl HorizontalContentAlignment="Stretch" ContentTemplate="{StaticResource ResourceKey=dllItemTemplate}"
                                                      Content="{Binding gIncludeDir}"></UserControl>
                         <UserControl HorizontalContentAlignment="Stretch" ContentTemplate="{StaticResource ResourceKey=dllItemTemplate}"
@@ -101,7 +100,7 @@
                 </Grid>
             </DataTemplate>
             <DataTemplate DataType="{x:Type local:X64Or32DllItem}" x:Key="X64Or32Template2">
-                <Expander Margin="30,0" IsExpanded="True" Style="{StaticResource MaterialDesignExpander}">
+                <Expander Margin="30,0" IsExpanded="True">
                     <Expander.Header>
                         <StackPanel Orientation="Horizontal" MinWidth="100" VerticalAlignment="Center">
                             <CheckBox IsChecked="{Binding gIsChecked}" Margin="5,0" VerticalAlignment="Center"></CheckBox>
@@ -117,14 +116,14 @@
                 </Expander>
             </DataTemplate>
             <DataTemplate DataType="{x:Type local:sdkModelItem}" x:Key="sdkModelTemplate">
-                    <Expander HorizontalContentAlignment="Stretch" Style="{StaticResource MaterialDesignExpander}">
+                <Expander HorizontalContentAlignment="Stretch">
                     <Expander.Header>
                             <StackPanel Orientation="Horizontal" MinWidth="100" VerticalAlignment="Center">
                                 <CheckBox IsChecked="{Binding gIsChecked}" Margin="5,0" VerticalAlignment="Center"></CheckBox>
                                 <TextBlock Text="{Binding gItemName}"></TextBlock>
                             </StackPanel>
                         </Expander.Header>
-                    <ListBox x:Name="sdkListName" HorizontalAlignment="Stretch" VerticalAlignment="Center" 
+                    <ListBox x:Name="sdkListName" ScrollViewer.VerticalScrollBarVisibility="Disabled" HorizontalAlignment="Stretch" VerticalAlignment="Center" 
                               MouseRightButtonDown="TreeViewItem_PreviewMouseRightButtonDown">
                         <ListBox.ContextMenu>
                             <ContextMenu>
@@ -140,14 +139,17 @@
                 </DataTemplate>
 
             <DataTemplate DataType="{x:Type local:sdkModelItem}" x:Key="sdkModelTemplateNoEdit">
-                <Expander HorizontalContentAlignment="Stretch" Style="{StaticResource MaterialDesignExpander}">
+                <Expander HorizontalContentAlignment="Stretch">
                     <Expander.Header>
                         <StackPanel Orientation="Horizontal" MinWidth="100" VerticalAlignment="Center">
                             <CheckBox IsChecked="{Binding gIsChecked}" Margin="5,0" VerticalAlignment="Center"></CheckBox>
                             <TextBlock Text="{Binding gItemName}"></TextBlock>
+                            <TextBlock Text="-"></TextBlock>
+                            <TextBlock Text="{Binding gDllVersion}"></TextBlock>
                         </StackPanel>
                     </Expander.Header>
-                    <ListBox x:Name="sdkListName" HorizontalAlignment="Stretch" VerticalAlignment="Center" 
+                    <ListBox x:Name="sdkListName" ScrollViewer.VerticalScrollBarVisibility="Disabled"
+                             HorizontalAlignment="Stretch" VerticalAlignment="Center" 
                               MouseRightButtonDown="TreeViewItem_PreviewMouseRightButtonDown">
                         <ListBox.ContextMenu>
                             <ContextMenu>
@@ -162,14 +164,14 @@
                 </Expander>
             </DataTemplate>
             <DataTemplate DataType="{x:Type local:CompelierItem}" x:Key="comPelierTemPlate">
-                    <Expander Margin="10,0" HorizontalContentAlignment="Stretch" Style="{StaticResource MaterialDesignExpander}">
+                    <Expander Margin="10,0"  HorizontalContentAlignment="Stretch">
                         <Expander.Header>
                             <StackPanel Orientation="Horizontal" Margin="2,2,5,2">
                                 <TextBlock Text="编译器: "></TextBlock>
                                 <TextBlock Text="{Binding gItemName}"></TextBlock>
                             </StackPanel>
                         </Expander.Header>
-                        <ListBox Margin="15,0" ScrollViewer.CanContentScroll="True" 
+                        <ListBox Margin="15,0" ScrollViewer.VerticalScrollBarVisibility="Disabled" 
                                  SelectedItem="{Binding gCurSdkModelItem}" 
                                  ItemsSource="{Binding gSdkItemList}" 
                                  ItemTemplate="{StaticResource sdkModelTemplate}">
@@ -209,8 +211,7 @@
                     <GroupBox Header="SDK内容">
                         <Grid>
                             <ScrollViewer CanContentScroll="True" VerticalScrollBarVisibility="Auto">
-                                <ListBox HorizontalContentAlignment="Stretch" ScrollViewer.CanContentScroll="True" 
-                                         ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                <ListBox HorizontalContentAlignment="Stretch"
                                          ItemsSource="{Binding gModel.gBuildModel.gCompelierSource}"
                                          ItemTemplate="{StaticResource comPelierTemPlate}">
 
@@ -247,7 +248,7 @@
                                 </DockPanel>
                                 <DockPanel VerticalAlignment="Bottom" LastChildFill="True" Grid.Column="1">
                                     <Label Content="配置文件路径: " VerticalAlignment="Bottom" DockPanel.Dock="Left"></Label>
-                                    <TextBlock Text="{Binding gModel.gBuildModel.gSettingPath}"
+                                    <TextBlock Text="{Binding gModel.gBuildModel.gSettingPath}" VerticalAlignment="Center" Margin="0,5,0,0"
                                             TextWrapping="Wrap" TextTrimming="CharacterEllipsis"  ToolTip="{Binding gModel.gBuildModel.gSettingPath}"></TextBlock>
                                 </DockPanel>
                             </Grid>
@@ -277,7 +278,7 @@
                 </GroupBox>
                 <Button Content="选择vcxproj文件" Command="{Binding gModel.gOpenCcProjFile}" DockPanel.Dock="Right" Margin="10,0,0,0" Width="100"></Button>
                 <Label Content="vcxproj路径: "></Label>
-                <TextBlock TextTrimming="CharacterEllipsis" ToolTip="{Binding gModel.gBuildModel.gVcxprojFile}" Text="{Binding gModel.gBuildModel.gVcxprojFile}"></TextBlock>
+                <TextBlock TextTrimming="CharacterEllipsis" VerticalAlignment="Center" Margin="0,5,0,0" ToolTip="{Binding gModel.gBuildModel.gVcxprojFile}" Text="{Binding gModel.gBuildModel.gVcxprojFile}"></TextBlock>
             </DockPanel>
         </Border>
         <Border Grid.Row="4">

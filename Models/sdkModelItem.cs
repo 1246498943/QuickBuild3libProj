@@ -176,15 +176,15 @@ namespace XPloteQuickBuidProj
 
         public string Platform_Release_Lib_String()
         {
-            return $"{gItemName}\\{mDebug.LibString()}";
+            return $"{gItemName}\\{mRelease.LibString()}";
         }
         public string Platform_Release_Dll_String()
         {
-            return $"{gItemName}\\{mDebug.DllString()}";
+            return $"{gItemName}\\{mRelease.DllString()}";
         }
         public string Platform_Release_Include_String()
         {
-            return $"{gItemName}\\{mDebug.IncludeString()}";
+            return $"{gItemName}\\{mRelease.IncludeString()}";
         }
 
 
@@ -325,7 +325,7 @@ namespace XPloteQuickBuidProj
         /// <summary>
         /// 是否选中.
         /// </summary>
-        private bool? mIsChecked;
+        private bool? mIsChecked = false;
         public bool? gIsChecked
         {
             get => mIsChecked;

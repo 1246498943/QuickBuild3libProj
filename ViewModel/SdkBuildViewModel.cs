@@ -263,38 +263,99 @@ namespace XPloteQuickBuidProj
             //x32/Debug/include + lib + dll;
             //x32/Release/include + lib + dll;
             //string libStr_Debug = "", includeStr_Debug = "", dllStr_Debug = ""
-            //    ,;
 
-            string[] StrDes = new string[12];
 
+            string[] StrDes = new string[16];
             foreach (var sdkItem in gBuildModel?.gBuildSdkSource)
             {
                 //64/debug/
-                StrDes[0]+=$"{sdkItem.DllName_64_Debug_Lib_String()};\r\n";
-                StrDes[1]+=$"{sdkItem.DllName_64__Debug_Dll_String()};\r\n";
-                StrDes[2]+=$"{sdkItem.DllName_64__Debug_Include_String()};\r\n";
+                if(sdkItem.gDll64.gIsChecked==true)
+                {
+                    if(sdkItem.gDll64.gDebug.gIsChecked==true)
+                    {
+                        StrDes[0]+=$"{sdkItem.DllName_64_Debug_Lib_String()};\r\n";
+                        StrDes[1]+=$"{sdkItem.DllName_64__Debug_Dll_String()};\r\n";
+                        StrDes[2]+=$"{sdkItem.DllName_64__Debug_Include_String()};\r\n";
+                        foreach (var libName in sdkItem.gDll64.gDebug.gLibDir.gLibSources)
+                        {
+                            StrDes[3]+=$"{libName}\r\n";
+                        }
+                    }
+                    if(sdkItem.gDll64.gRelease.gIsChecked==true)
+                    {
+                        //64/Release/
+                        StrDes[4]+=$"{sdkItem.DllName_64_Release_Lib_String()};\r\n";
+                        StrDes[5]+=$"{sdkItem.DllName_64__Release_Dll_String()};\r\n";
+                        StrDes[6]+=$"{sdkItem.DllName_64__Release_Include_String()};\r\n";
+                        foreach (var libName in sdkItem.gDll64.gRelease.gLibDir.gLibSources)
+                        {
+                            StrDes[7]+=$"{libName}\r\n";
+                        }
+                    }
 
-                //64/Release/
-                StrDes[3]+=$"{sdkItem.DllName_64_Release_Lib_String()};\r\n";
-                StrDes[4]+=$"{sdkItem.DllName_64__Release_Dll_String()};\r\n";
-                StrDes[5]+=$"{sdkItem.DllName_64__Release_Include_String()};\r\n";
+                }
 
+                if(sdkItem.gDll32.gIsChecked==true)
+                {
+                    if(sdkItem.gDll32.gDebug.gIsChecked==true)
+                    {
 
-                StrDes[6]+=$"{sdkItem.DllName_32_Debug_Lib_String()};\r\n";
-                StrDes[7]+=$"{sdkItem.DllName_32__Debug_Dll_String()};\r\n";
-                StrDes[8]+=$"{sdkItem.DllName_32__Debug_Include_String()};\r\n";
+                        StrDes[8]+=$"{sdkItem.DllName_32_Debug_Lib_String()};\r\n";
+                        StrDes[9]+=$"{sdkItem.DllName_32__Debug_Dll_String()};\r\n";
+                        StrDes[10]+=$"{sdkItem.DllName_32__Debug_Include_String()};\r\n";
+                        foreach (var libName in sdkItem.gDll32.gDebug.gLibDir.gLibSources)
+                        {
+                            StrDes[11]+=$"{libName}\r\n";
+                        }
 
-                StrDes[9]+=$"{sdkItem.DllName_32_Release_Lib_String()};\r\n";
-                StrDes[10]+=$"{sdkItem.DllName_32__Release_Dll_String()};\r\n";
-                StrDes[11]+=$"{sdkItem.DllName_32__Release_Include_String()};\r\n";
+                    }
+                    if (sdkItem.gDll32.gRelease.gIsChecked==true)
+                    {
+                        StrDes[12]+=$"{sdkItem.DllName_32_Release_Lib_String()};\r\n";
+                        StrDes[13]+=$"{sdkItem.DllName_32__Release_Dll_String()};\r\n";
+                        StrDes[14]+=$"{sdkItem.DllName_32__Release_Include_String()};\r\n";
+                        foreach (var libName in sdkItem.gDll32.gRelease.gLibDir.gLibSources)
+                        {
+                            StrDes[15]+=$"{libName}\r\n";
+                        }
+                    }
+                }
 
             }
+
+            var strFormat = (string str) =>
+            {
+
+                return $"------------------------{str}---------------------------\r\n";
+            };
+
             StringBuilder sb = new StringBuilder();
             for (int i = 0; i < StrDes.Length; i++)
             {
-                if(i>0 && i%3==0)
+                switch (i)
                 {
-                    sb.AppendLine($"{"----------------------------------"}\r\n\r\n");
+                    case 0:
+                        {
+                            sb.AppendLine(strFormat("x64-Debug"));
+                            break;
+                        }
+                    case 4:
+                        {
+                            sb.AppendLine(strFormat("x64-Release"));
+                            break;
+                        }
+                    case 8:
+                        {
+                            sb.AppendLine(strFormat("x32-Debug"));
+                            break;
+                        }
+                    case 12:
+                        {
+                            sb.AppendLine(strFormat("x32-Release"));
+                            break;
+                        }
+                    default:
+                        break;
                 }
                 sb.AppendLine(StrDes[i]);
             }
@@ -379,6 +440,11 @@ namespace XPloteQuickBuidProj
 
                 return System.IO.Path.GetFileNameWithoutExtension(str);
             };
+            var GetFileNameWithExtension = (string str) =>
+            {
+
+                return System.IO.Path.GetFileName(str);
+            };
 
             //先从这里获取第一层文件夹.区分遍历器库版本.
             var compilerDirs = Directory.GetDirectories(curSdkDir,"",SearchOption.TopDirectoryOnly);
@@ -392,8 +458,12 @@ namespace XPloteQuickBuidProj
                 var dllDirs = Directory.GetDirectories(compilerDirItem, "", SearchOption.TopDirectoryOnly);
                 foreach (var dllDirItem in dllDirs)
                 {
-                    var dllName =GetDirNameFromPath(dllDirItem).Split('-').ToList().First();//使用"-"分割文字,获取第一个;;
+                    var nameList =GetDirNameFromPath(dllDirItem).Split('-').ToList();//使用"-"分割文字,获取第一个;;
+                    var dllName = nameList.FirstOrDefault();
+                    var dllVersion = "";
+                    if(nameList.Count>1) dllVersion= nameList[1];
                     sdkModelItem sdkModel = new sdkModelItem(dllName);
+                    sdkModel.gDllVersion = dllVersion; 
                     compelierModel.gSdkItemList.Add(sdkModel);
  
                     //这一层,获取到所有的库目录
@@ -402,7 +472,7 @@ namespace XPloteQuickBuidProj
                     {
                         var m32or64Name = GetDirNameFromPath(m63Or32Item);
                         //32位
-                        if (m63Or32Item.ToUpper().Contains("x32"))
+                        if (m63Or32Item.ToUpper().Contains("X32"))
                         {
                             //区分Debug/or Release;
                             var mDebugOrReleaseDir = Directory.GetDirectories(m63Or32Item, "", SearchOption.TopDirectoryOnly);
@@ -419,19 +489,19 @@ namespace XPloteQuickBuidProj
                                     foreach (var mLib_inc_dlls_item in m_lib_inc_dlls)
                                     {
                                         ///文件夹的路径已经获取完毕
-                                        var curLibName = mDebugOrReleaseDirItem.ToUpper();
+                                        var curLibName = GetDirNameFromPath(mLib_inc_dlls_item).ToUpper();
                                         switch (curLibName)
                                         {
                                             case "LIB":
                                                 {
                                                     //获取当前所有的文件,而且是.lib的文件.
-                                                    var curLibLists = Directory.GetDirectories(mLib_inc_dlls_item, "", SearchOption.AllDirectories);
-                                                    var m64ReleaseLibDll = sdkModel?.gDll32?.gDebug.gLibDir.gLibSources;
+                                                    var curLibLists = Directory.GetFiles(mLib_inc_dlls_item, "", SearchOption.AllDirectories);
+                                                    var mLibLists = sdkModel?.gDll32?.gDebug.gLibDir.gLibSources;
                                                     foreach (var curLibItem in curLibLists)
                                                     {
                                                         if (curLibItem.ToUpper().Contains(".LIB"))
                                                         {
-                                                            m64ReleaseLibDll.Add(GetDirNameFromPath(curLibItem));
+                                                            mLibLists.Add(GetFileNameWithExtension(curLibItem));
                                                         }
                                                     }
                                                     break;
@@ -457,19 +527,19 @@ namespace XPloteQuickBuidProj
                                     foreach (var mLib_inc_dlls_item in m_lib_inc_dlls)
                                     {
                                         ///文件夹的路径已经获取完毕
-                                        var curLibName = mDebugOrReleaseDirItem.ToUpper();
+                                        var curLibName = GetDirNameFromPath(mLib_inc_dlls_item).ToUpper();
                                         switch (curLibName)
                                         {
                                             case "LIB":
                                                 {
                                                     //获取当前所有的文件,而且是.lib的文件.
-                                                    var curLibLists = Directory.GetDirectories(mLib_inc_dlls_item, "", SearchOption.AllDirectories);
-                                                    var m64ReleaseLibDll = sdkModel?.gDll32?.gRelease.gLibDir.gLibSources;
+                                                    var curLibLists = Directory.GetFiles(mLib_inc_dlls_item, "", SearchOption.AllDirectories);
+                                                    var mLibLists = sdkModel?.gDll32?.gRelease.gLibDir.gLibSources;
                                                     foreach (var curLibItem in curLibLists)
                                                     {
                                                         if (curLibItem.ToUpper().Contains(".LIB"))
                                                         {
-                                                            m64ReleaseLibDll.Add(GetDirNameFromPath(curLibItem));
+                                                            mLibLists.Add(GetFileNameWithExtension(curLibItem));
                                                         }
                                                     }
                                                     break;
@@ -492,7 +562,7 @@ namespace XPloteQuickBuidProj
                             }
 
                         }
-                        else if(m63Or32Item.ToUpper().Contains("x64"))//64位
+                        else if(m63Or32Item.ToUpper().Contains("X64"))//64位
                         {
                             //区分Debug/or Release;
                             var mDebugOrReleaseDir = Directory.GetDirectories(m63Or32Item, "", SearchOption.TopDirectoryOnly);
@@ -509,19 +579,19 @@ namespace XPloteQuickBuidProj
                                     foreach (var mLib_inc_dlls_item in m_lib_inc_dlls)
                                     {
                                         ///文件夹的路径已经获取完毕
-                                        var curLibName = mDebugOrReleaseDirItem.ToUpper();
+                                        var curLibName = GetDirNameFromPath(mLib_inc_dlls_item).ToUpper();
                                         switch (curLibName)
                                         {
                                             case "LIB":
                                                 {
                                                     //获取当前所有的文件,而且是.lib的文件.
-                                                    var curLibLists = Directory.GetDirectories(mLib_inc_dlls_item, "", SearchOption.AllDirectories);
-                                                    var m64ReleaseLibDll = sdkModel?.gDll64?.gDebug.gLibDir.gLibSources;
+                                                    var curLibLists = Directory.GetFiles(mLib_inc_dlls_item, "", SearchOption.AllDirectories);
+                                                    var mLibLists = sdkModel?.gDll64?.gDebug.gLibDir.gLibSources;
                                                     foreach (var curLibItem in curLibLists)
                                                     {
                                                         if (curLibItem.ToUpper().Contains(".LIB"))
                                                         {
-                                                            m64ReleaseLibDll.Add(GetDirNameFromPath(curLibItem));
+                                                            mLibLists.Add(GetFileNameWithExtension(curLibItem));
                                                         }
                                                     }
                                                     break;
@@ -547,19 +617,19 @@ namespace XPloteQuickBuidProj
                                     foreach (var mLib_inc_dlls_item in m_lib_inc_dlls)
                                     {
                                         ///文件夹的路径已经获取完毕
-                                        var curLibName = mDebugOrReleaseDirItem.ToUpper();
+                                        var curLibName = GetDirNameFromPath(mLib_inc_dlls_item).ToUpper();
                                         switch (curLibName)
                                         {
                                             case "LIB":
                                                 {
                                                     //获取当前所有的文件,而且是.lib的文件.
-                                                    var curLibLists = Directory.GetDirectories(mLib_inc_dlls_item,"", SearchOption.AllDirectories);
-                                                    var m64ReleaseLibDll = sdkModel?.gDll64?.gRelease.gLibDir.gLibSources;
+                                                    var curLibLists = Directory.GetFiles(mLib_inc_dlls_item,"", SearchOption.AllDirectories);
+                                                    var mLibLists = sdkModel?.gDll64?.gRelease.gLibDir.gLibSources;
                                                     foreach (var curLibItem in curLibLists)
                                                     {
                                                         if(curLibItem.ToUpper().Contains(".LIB"))
                                                         {
-                                                            m64ReleaseLibDll.Add(GetDirNameFromPath(curLibItem));
+                                                            mLibLists.Add(GetFileNameWithExtension(curLibItem));
                                                         }
                                                     }
                                                     break;
