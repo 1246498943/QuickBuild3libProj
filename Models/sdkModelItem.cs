@@ -257,11 +257,11 @@ namespace XPloteQuickBuidProj
         {
             return $"{gItemName}\\{mDll64.Platform_Debug_Lib_String()}";
         }
-        public string DllName_64__Debug_Dll_String()
+        public string DllName_64_Debug_Dll_String()
         {
             return $"{gItemName}\\{mDll64.Platform_Debug_Dll_String()}";
         }
-        public string DllName_64__Debug_Include_String()
+        public string DllName_64_Debug_Include_String()
         {
             return $"{gItemName}\\{mDll64.Platform_Debug_Include_String()}";
         }
@@ -270,11 +270,11 @@ namespace XPloteQuickBuidProj
         {
             return $"{gItemName}\\{mDll64.Platform_Release_Lib_String()}";
         }
-        public string DllName_64__Release_Dll_String()
+        public string DllName_64_Release_Dll_String()
         {
             return $"{gItemName}\\{mDll64.Platform_Release_Dll_String()}";
         }
-        public string DllName_64__Release_Include_String()
+        public string DllName_64_Release_Include_String()
         {
             return $"{gItemName}\\{mDll64.Platform_Release_Include_String()}";
         }
@@ -283,11 +283,11 @@ namespace XPloteQuickBuidProj
         {
             return $"{gItemName}\\{mDll32.Platform_Debug_Lib_String()}";
         }
-        public string DllName_32__Debug_Dll_String()
+        public string DllName_32_Debug_Dll_String()
         {
             return $"{gItemName}\\{mDll32.Platform_Debug_Dll_String()}";
         }
-        public string DllName_32__Debug_Include_String()
+        public string DllName_32_Debug_Include_String()
         {
             return $"{gItemName}\\{mDll32.Platform_Debug_Include_String()}";
         }
@@ -296,11 +296,11 @@ namespace XPloteQuickBuidProj
         {
             return $"{gItemName}\\{mDll32.Platform_Release_Lib_String()}";
         }
-        public string DllName_32__Release_Dll_String()
+        public string DllName_32_Release_Dll_String()
         {
             return $"{gItemName}\\{mDll32.Platform_Release_Dll_String()}";
         }
-        public string DllName_32__Release_Include_String()
+        public string DllName_32_Release_Include_String()
         {
             return $"{gItemName}\\{mDll32.Platform_Release_Include_String()}";
         }

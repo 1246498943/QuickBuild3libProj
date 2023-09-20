@@ -249,19 +249,20 @@ namespace XPloteQuickBuidProj
 
             gBuildAndWriteConfig2VCProj = new RelayCommand(() => {
 
+                var curVcxProjFile = gBuildModel.gVcxprojFile;
 
-                var content = ReadVcxProj(gBuildModel.gVcxprojFile);
 
+                //WriteChangedVcxProj(gBuildModel.gVcxprojFile); //数据写入
                 //解析内容.
 
+                var curStr = BuildVcxprojFile(curVcxProjFile);
 
                 if (mShowContentWnd==null)
                 {
                     mShowContentWnd = new ShowContent();
                 }
-                //设置内容.
-                var curStr = GetWriteContentSt();
-                mShowContentWnd.SetVcxProjContentStr(content);
+                //var content = ReadVcxProj(curVcxProjFile);//读取到的内容.
+                mShowContentWnd.SetVcxProjContentStr(curStr);
                 mShowContentWnd.ShowWnd();
 
             });
@@ -270,8 +271,128 @@ namespace XPloteQuickBuidProj
 
         }
 
-
+        /// <summary>
+        /// 设置一个新功能,输入标记的节点,返回一个Dictionary<string,list<string>> node-Name: noe-Value;的数值.
+        /// </summary>
+        /// <param name="vcxProjFile"></param>
+        /// <returns></returns>
         private string ReadVcxProj(string vcxProjFile)
+        {
+            StringBuilder sb = new StringBuilder();
+
+            GlobalGetErrorHelper.GetError(() => {
+
+ 
+                XmlDocument doc = new XmlDocument();
+                // 加载 vcxproj 文件
+                doc.Load(vcxProjFile);
+                // 获取根元素 Project
+                XmlElement root = doc.DocumentElement;
+
+                {
+                    string resultStr = string.Empty;
+                    int index = 0;
+                    List<SearchNode> searchList = new List<SearchNode>();
+                    {
+                        //写入搜索内容.
+                        SearchNode T1 = new SearchNode(@"ItemDefinitionGroup", "'$(Configuration)|$(Platform)'=='Debug|x64'");
+                        SearchNode T2 = new SearchNode(@"ClCompile");
+                        SearchNode T3 = new SearchNode(@"AdditionalIncludeDirectories");
+
+                        searchList.Add(T1);
+                        searchList.Add(T2);
+                        searchList.Add(T3);
+                    }
+                    XmlNodeHelper.GetContentValueFromNodeLists(root, searchList, ref resultStr, ref index);
+
+
+                    sb.AppendLine($"附加文件目录:Debug|x64 \r\n");
+                    sb.AppendLine(resultStr);
+                    sb.AppendLine("\r\n");
+                }
+
+                {
+                    string resultStr = string.Empty;
+                    int index = 0;
+                    List<SearchNode> searchList = new List<SearchNode>();
+                    {
+                        //写入搜索内容.
+                        SearchNode T1 = new SearchNode(@"ItemDefinitionGroup", "'$(Configuration)|$(Platform)'=='Debug|x64'");
+                        SearchNode T2 = new SearchNode(@"Link");
+                        SearchNode T3 = new SearchNode(@"AdditionalLibraryDirectories");
+
+                        searchList.Add(T1);
+                        searchList.Add(T2);
+                        searchList.Add(T3);
+                    }
+                    XmlNodeHelper.GetContentValueFromNodeLists(root, searchList, ref resultStr, ref index);
+
+
+                    sb.AppendLine($"附加库目录:Debug|x64 \r\n");
+                    sb.AppendLine(resultStr);
+                    sb.AppendLine("\r\n");
+                }
+
+                {
+                    string resultStr = string.Empty;
+                    int index = 0;
+                    List<SearchNode> searchList = new List<SearchNode>();
+                    {
+                        //写入搜索内容.
+                        SearchNode T1 = new SearchNode(@"ItemDefinitionGroup", "'$(Configuration)|$(Platform)'=='Debug|x64'");
+                        SearchNode T2 = new SearchNode(@"Link");
+                        SearchNode T3 = new SearchNode(@"AdditionalDependencies");
+
+                        searchList.Add(T1);
+                        searchList.Add(T2);
+                        searchList.Add(T3);
+                    }
+                    XmlNodeHelper.GetContentValueFromNodeLists(root, searchList, ref resultStr, ref index);
+
+
+                    sb.AppendLine($"附加依赖项:Debug|x64 \r\n");
+                    sb.AppendLine(resultStr);
+                    sb.AppendLine("\r\n");
+                }
+
+            });
+            return sb.ToString();
+        }
+
+        private void WriteChangedVcxProj(string vcxProjFile)
+        {
+            XmlDocument doc = new XmlDocument();
+            // 加载 vcxproj 文件
+            doc.Load(vcxProjFile);
+            // 获取根元素 Project
+            XmlElement root = doc.DocumentElement;
+
+            //修改的内容.
+            {
+
+                string resultStr = "----------我被修改了------------";
+                int index = 0;
+                List<SearchNode> searchList = new List<SearchNode>();
+                {
+                    //写入搜索内容.
+                    SearchNode T1 = new SearchNode(@"ItemDefinitionGroup", "'$(Configuration)|$(Platform)'=='Debug|x64'");
+                    SearchNode T2 = new SearchNode(@"ClCompile");
+                    SearchNode T3 = new SearchNode(@"AdditionalIncludeDirectories");
+
+                    searchList.Add(T1);
+                    searchList.Add(T2);
+                    searchList.Add(T3);
+                }
+                XmlNodeHelper.ChangeContent2XmlNode(root, searchList,  resultStr,true, ref index);
+            }
+
+            //修改之后,重新保存为配置文件.
+            var vcxProjDir = System.IO.Path.GetDirectoryName(vcxProjFile);
+            var NewVcxProjFile = $"{vcxProjDir}\\newPro.vcxproj";
+            doc.Save(NewVcxProjFile);
+        }
+
+        private string ReadVcxProj_标准(string vcxProjFile)
         {
 
             StringBuilder sb = new StringBuilder();
@@ -363,85 +484,81 @@ namespace XPloteQuickBuidProj
             return sb.ToString();
         }
 
-        private string ReadVcxProj3(string vcxProjFile)
+
+        private string BuildVcxprojFile(string vcxProjFile)
         {
+            string str = "";
+            if (System.Windows.MessageBox.Show("在修改之前,请保存当前配置文件的副本","",MessageBoxButton.OKCancel)== MessageBoxResult.OK)
+            {
 
-            StringBuilder sb = new StringBuilder();
+                if(!File.Exists(vcxProjFile))
+                {
+                    System.Windows.MessageBox.Show("当前配置文件路径为空,请设置 .vcxproj 文件");
+                    return str;
+                }
 
-            GlobalGetErrorHelper.GetError(() => {
-                // 创建一个 XmlDocument 对象
                 XmlDocument doc = new XmlDocument();
                 // 加载 vcxproj 文件
                 doc.Load(vcxProjFile);
                 // 获取根元素 Project
                 XmlElement root = doc.DocumentElement;
-                // 遍历 Project 的子节点
 
 
-                ExtractNode(root,"",sb);
+              
+                //return;
+                //获取查阅的内容.
+                UpdateSdkStr();
 
-            });
-            return sb.ToString();
-        }
-
-        static void ExtractNode(XmlNode node, string indent,StringBuilder sb)
-        {
-            // 输出缩进符和节点的名称
-            Console.WriteLine("{0}Name: {1}", indent, node.Name);
-            sb.AppendLine($"{indent}Name: {node.Name}");
-            // 判断节点是否有属性
-            if (node.Attributes != null)
-            {
-                // 遍历节点的属性
-                foreach (XmlAttribute attr in node.Attributes)
+                //获取内容.写入内容.
+                //拼接字符串后->转换成枚举->循环写入数据.
+                var isCover = gBuildModel.gIsCover;
+                for (int i = 0;i<(int)linkType.Link_Numbers;i++)
                 {
-                    // 输出缩进符和属性的名称和值
-                    Console.WriteLine("{0}Attribute: {1} = {2}", indent, attr.Name, attr.Value);
-                    sb.AppendLine($"{indent}Attribute: {attr.Name} = {attr.Value}");
+                    var contentStr = GetLinkStr((linkType)i);
+                    //解析三个模式.
+                    PlateForm plateForm = PlateForm.x64;
+                    DebugType mDebug = DebugType.Debug;
+                    DllType mDlltype = DllType.None;
+
+                    //转换数据.
+                    var curLinkStr = ((linkType)i).ToString();
+                    var curLinkLists = curLinkStr.Split('_');
+                    if (curLinkLists.Length!=3) continue;
+                    Enum.TryParse(curLinkLists[0], out plateForm);
+                    Enum.TryParse(curLinkLists[1], out mDebug);
+                    Enum.TryParse(curLinkLists[2], out mDlltype);
+                    XmlNodeHelper.WriteContent2VcxProjXmlNode(root, contentStr, isCover, plateForm,mDebug,mDlltype);
                 }
+                doc.Save(vcxProjFile);
+                str = root.InnerText;
             }
-            // 判断节点是否有文本内容
-            if (node.InnerText != "" && node.InnerText != node.InnerXml)
-            {
-                // 输出缩进符和节点的文本内容
-                Console.WriteLine("{0}Text: {1}", indent, node.InnerText);
-                sb.AppendLine($"{indent}Text: {node.InnerText}");
-            }
-            // 判断节点是否有子节点
-            if (node.HasChildNodes)
-            {
-                // 遍历节点的子节点
-                foreach (XmlNode child in node.ChildNodes)
-                {
-                    // 调用 ExtractNode 方法，传入子节点和增加一个制表符的缩进符作为参数
-                    ExtractNode(child, indent + "\t", sb);
-                }
-            }
+
+            return str;
         }
 
         public enum linkType : int
         {
-            x64_debug_lib = 0,
-            x64_debug_dll,
-            x64_debug_include,
-            x64_debug_liblists,
+            x64_Debug_Lib = 0,
+            x64_Debug_Dll,
+            x64_Debug_Include,
+            x64_Debug_LibLists,
+            
+            x64_Release_Lib,
+            x64_Release_Dll,
+            x64_Release_Include,
+            x64_Release_LibLists,
 
-            x64_release_lib,
-            x64_release_dll,
-            x64_release_include,
-            x64_release_liblists,
+            Win32_Debug_Lib,
+            Win32_Debug_Dll,
+            Win32_Debug_Include,
+            Win32_Debug_LibLists,
 
-            x32_debug_lib,
-            x32_debug_dll,
-            x32_debug_include,
-            x32_debug_liblists,
+            Win32_Release_Lib,
+            Win32_Release_Dll,
+            Win32_Release_Include,
+            Win32_Release_LibLists,
 
-            x32_release_lib,
-            x32_release_dll,
-            x32_release_include,
-            x32_release_liblists,
-
-            link_numbers
+            Link_Numbers
 
         }
 
@@ -459,6 +576,71 @@ namespace XPloteQuickBuidProj
         /// 
         /// </summary>
         private string[] SdkStrDes = new string[16];
+        private void UpdateSdkStr()
+        {
+
+            for (int i = 0; i < SdkStrDes.Length; i++)
+            {
+                SdkStrDes[i] = "";
+            }
+            string postFix = "\r\n";
+            foreach (var sdkItem in gBuildModel?.gBuildSdkSource)
+            {
+                //64/debug/
+                if (sdkItem.gDll64.gIsChecked==true)
+                {
+                    if (sdkItem.gDll64.gDebug.gIsChecked==true)
+                    {
+                        SdkStrDes[0]+=$"{sdkItem.DllName_64_Debug_Lib_String()};{postFix}";
+                        SdkStrDes[1]+=$"{sdkItem.DllName_64_Debug_Dll_String()};{postFix}";
+                        SdkStrDes[2]+=$"{sdkItem.DllName_64_Debug_Include_String()};{postFix}";
+                        foreach (var libName in sdkItem.gDll64.gDebug.gLibDir.gLibSources)
+                        {
+                            SdkStrDes[3]+=$"{libName}{postFix}";
+                        }
+                    }
+                    if (sdkItem.gDll64.gRelease.gIsChecked==true)
+                    {
+                        //64/Release/
+                        SdkStrDes[4]+=$"{sdkItem.DllName_64_Release_Lib_String()};{postFix}";
+                        SdkStrDes[5]+=$"{sdkItem.DllName_64_Release_Dll_String()};{postFix}";
+                        SdkStrDes[6]+=$"{sdkItem.DllName_64_Release_Include_String()};{postFix}";
+                        foreach (var libName in sdkItem.gDll64.gRelease.gLibDir.gLibSources)
+                        {
+                            SdkStrDes[7]+=$"{libName}{postFix}";
+                        }
+                    }
+
+                }
+
+                if (sdkItem.gDll32.gIsChecked==true)
+                {
+                    if (sdkItem.gDll32.gDebug.gIsChecked==true)
+                    {
+
+                        SdkStrDes[8]+=$"{sdkItem.DllName_32_Debug_Lib_String()};{postFix}";
+                        SdkStrDes[9]+=$"{sdkItem.DllName_32_Debug_Dll_String()};{postFix}";
+                        SdkStrDes[10]+=$"{sdkItem.DllName_32_Debug_Include_String()};{postFix}";
+                        foreach (var libName in sdkItem.gDll32.gDebug.gLibDir.gLibSources)
+                        {
+                            SdkStrDes[11]+=$"{libName}{postFix}";
+                        }
+
+                    }
+                    if (sdkItem.gDll32.gRelease.gIsChecked==true)
+                    {
+                        SdkStrDes[12]+=$"{sdkItem.DllName_32_Release_Lib_String()};{postFix}";
+                        SdkStrDes[13]+=$"{sdkItem.DllName_32_Release_Dll_String()};{postFix}";
+                        SdkStrDes[14]+=$"{sdkItem.DllName_32_Release_Include_String()};{postFix}";
+                        foreach (var libName in sdkItem.gDll32.gRelease.gLibDir.gLibSources)
+                        {
+                            SdkStrDes[15]+=$"{libName}{postFix}";
+                        }
+                    }
+                }
+
+            }
+        }
         private string GetWriteContentSt()
         {
             //分层4组: 
@@ -469,67 +651,7 @@ namespace XPloteQuickBuidProj
             //x32/Release/include + lib + dll;
             //string libStr_Debug = "", includeStr_Debug = "", dllStr_Debug = ""
 
-            for (int i = 0; i < SdkStrDes.Length; i++)
-            {
-                SdkStrDes[i] = "";
-            }
-            
-            foreach (var sdkItem in gBuildModel?.gBuildSdkSource)
-            {
-                //64/debug/
-                if(sdkItem.gDll64.gIsChecked==true)
-                {
-                    if(sdkItem.gDll64.gDebug.gIsChecked==true)
-                    {
-                        SdkStrDes[0]+=$"{sdkItem.DllName_64_Debug_Lib_String()};\r\n";
-                        SdkStrDes[1]+=$"{sdkItem.DllName_64__Debug_Dll_String()};\r\n";
-                        SdkStrDes[2]+=$"{sdkItem.DllName_64__Debug_Include_String()};\r\n";
-                        foreach (var libName in sdkItem.gDll64.gDebug.gLibDir.gLibSources)
-                        {
-                            SdkStrDes[3]+=$"{libName}\r\n";
-                        }
-                    }
-                    if(sdkItem.gDll64.gRelease.gIsChecked==true)
-                    {
-                        //64/Release/
-                        SdkStrDes[4]+=$"{sdkItem.DllName_64_Release_Lib_String()};\r\n";
-                        SdkStrDes[5]+=$"{sdkItem.DllName_64__Release_Dll_String()};\r\n";
-                        SdkStrDes[6]+=$"{sdkItem.DllName_64__Release_Include_String()};\r\n";
-                        foreach (var libName in sdkItem.gDll64.gRelease.gLibDir.gLibSources)
-                        {
-                            SdkStrDes[7]+=$"{libName}\r\n";
-                        }
-                    }
-
-                }
-
-                if(sdkItem.gDll32.gIsChecked==true)
-                {
-                    if(sdkItem.gDll32.gDebug.gIsChecked==true)
-                    {
-
-                        SdkStrDes[8]+=$"{sdkItem.DllName_32_Debug_Lib_String()};\r\n";
-                        SdkStrDes[9]+=$"{sdkItem.DllName_32__Debug_Dll_String()};\r\n";
-                        SdkStrDes[10]+=$"{sdkItem.DllName_32__Debug_Include_String()};\r\n";
-                        foreach (var libName in sdkItem.gDll32.gDebug.gLibDir.gLibSources)
-                        {
-                            SdkStrDes[11]+=$"{libName}\r\n";
-                        }
-
-                    }
-                    if (sdkItem.gDll32.gRelease.gIsChecked==true)
-                    {
-                        SdkStrDes[12]+=$"{sdkItem.DllName_32_Release_Lib_String()};\r\n";
-                        SdkStrDes[13]+=$"{sdkItem.DllName_32__Release_Dll_String()};\r\n";
-                        SdkStrDes[14]+=$"{sdkItem.DllName_32__Release_Include_String()};\r\n";
-                        foreach (var libName in sdkItem.gDll32.gRelease.gLibDir.gLibSources)
-                        {
-                            SdkStrDes[15]+=$"{libName}\r\n";
-                        }
-                    }
-                }
-
-            }
+            UpdateSdkStr();
 
             var strFormat = (string str) =>
             {
@@ -770,7 +892,7 @@ namespace XPloteQuickBuidProj
                             }
 
                         }
-                        else if(m63Or32Item.ToUpper().Contains("X64"))//64位
+                        else if(m63Or32Item.ToUpper().Contains("x64"))//64位
                         {
                             //区分Debug/or Release;
                             var mDebugOrReleaseDir = Directory.GetDirectories(m63Or32Item, "", SearchOption.TopDirectoryOnly);
