@@ -618,7 +618,7 @@ namespace XPloteQuickBuidProj
                         SdkStrDes[2]+=$"{curSdkDir}{sdkItem.DllName_64_Debug_Include_String()};{postFix}";
                         foreach (var libName in sdkItem.gDll64.gDebug.gLibDir.gLibSources)
                         {
-                            SdkStrDes[3]+=$"{libName}{postFix}";
+                            SdkStrDes[3]+=$"{libName};{postFix}";
                         }
                     }
                     if (sdkItem.gDll64.gRelease.gIsChecked==true)
@@ -629,7 +629,7 @@ namespace XPloteQuickBuidProj
                         SdkStrDes[6]+=$"{curSdkDir}{sdkItem.DllName_64_Release_Include_String()};{postFix}";
                         foreach (var libName in sdkItem.gDll64.gRelease.gLibDir.gLibSources)
                         {
-                            SdkStrDes[7]+=$"{libName}{postFix}";
+                            SdkStrDes[7]+=$"{libName};{postFix}";
                         }
                     }
 
@@ -645,7 +645,7 @@ namespace XPloteQuickBuidProj
                         SdkStrDes[10]+=$"{curSdkDir}{sdkItem.DllName_32_Debug_Include_String()};{postFix}";
                         foreach (var libName in sdkItem.gDll32.gDebug.gLibDir.gLibSources)
                         {
-                            SdkStrDes[11]+=$"{libName}{postFix}";
+                            SdkStrDes[11]+=$"{libName};{postFix}";
                         }
 
                     }
@@ -656,7 +656,7 @@ namespace XPloteQuickBuidProj
                         SdkStrDes[14]+=$"{curSdkDir}{sdkItem.DllName_32_Release_Include_String()};{postFix}";
                         foreach (var libName in sdkItem.gDll32.gRelease.gLibDir.gLibSources)
                         {
-                            SdkStrDes[15]+=$"{libName}{postFix}";
+                            SdkStrDes[15]+=$"{libName};{postFix}";
                         }
                     }
                 }
@@ -810,11 +810,13 @@ namespace XPloteQuickBuidProj
                 var dllDirs = Directory.GetDirectories(compilerDirItem, "", SearchOption.TopDirectoryOnly);
                 foreach (var dllDirItem in dllDirs)
                 {
-                    var nameList =GetDirNameFromPath(dllDirItem).Split('-').ToList();//使用"-"分割文字,获取第一个;;
-                    var dllName = nameList.FirstOrDefault();
+                    var dllFileName = GetDirNameFromPath(dllDirItem);
+                    var nameList = dllFileName.Split('-').ToList();//分离版本号
+                    var dllName = dllFileName;
                     var dllVersion = "";
                     if(nameList.Count>1) dllVersion= nameList[1];
                     sdkModelItem sdkModel = new sdkModelItem(dllName);
+                    sdkModel.gCompelierVersion = comPelierName; //编译器版本编译的库
                     sdkModel.gDllVersion = dllVersion; 
                     compelierModel.gSdkItemList.Add(sdkModel);
  
@@ -914,7 +916,7 @@ namespace XPloteQuickBuidProj
                             }
 
                         }
-                        else if(m63Or32Item.ToUpper().Contains("x64"))//64位
+                        else if(m63Or32Item.ToUpper().Contains("X64"))//64位
                         {
                             //区分Debug/or Release;
                             var mDebugOrReleaseDir = Directory.GetDirectories(m63Or32Item, "", SearchOption.TopDirectoryOnly);

@@ -144,8 +144,8 @@
                         <StackPanel Orientation="Horizontal" MinWidth="100" VerticalAlignment="Center">
                             <CheckBox IsChecked="{Binding gIsChecked}" Margin="5,0" VerticalAlignment="Center"></CheckBox>
                             <TextBlock Text="{Binding gItemName}"></TextBlock>
-                            <TextBlock Text="-"></TextBlock>
-                            <TextBlock Text="{Binding gDllVersion}"></TextBlock>
+                            <!--<TextBlock Text="-"></TextBlock>
+                            <TextBlock Text="{Binding gDllVersion}"></TextBlock>-->
                         </StackPanel>
                     </Expander.Header>
                     <ListBox x:Name="sdkListName" ScrollViewer.VerticalScrollBarVisibility="Disabled"

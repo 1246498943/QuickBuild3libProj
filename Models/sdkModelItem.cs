@@ -245,7 +245,6 @@ namespace XPloteQuickBuidProj
     public class sdkModelItem : PathDllItem
     {
 
-
         public sdkModelItem(string mName):base(mName)
         {
             mDll32 = new X64Or32DllItem("x32");
@@ -255,54 +254,54 @@ namespace XPloteQuickBuidProj
 
         public string DllName_64_Debug_Lib_String()
         {
-            return $"{gItemName}\\{mDll64.Platform_Debug_Lib_String()}";
+            return $"{gCompelierVersion}\\{gItemName}\\{mDll64.Platform_Debug_Lib_String()}";
         }
         public string DllName_64_Debug_Dll_String()
         {
-            return $"{gItemName}\\{mDll64.Platform_Debug_Dll_String()}";
+            return $"{gCompelierVersion}\\{gItemName}\\{mDll64.Platform_Debug_Dll_String()}";
         }
         public string DllName_64_Debug_Include_String()
         {
-            return $"{gItemName}\\{mDll64.Platform_Debug_Include_String()}";
+            return $"{gCompelierVersion}\\{gItemName}\\{mDll64.Platform_Debug_Include_String()}";
         }
 
         public string DllName_64_Release_Lib_String()
         {
-            return $"{gItemName}\\{mDll64.Platform_Release_Lib_String()}";
+            return $"{gCompelierVersion}\\{gItemName}\\{mDll64.Platform_Release_Lib_String()}";
         }
         public string DllName_64_Release_Dll_String()
         {
-            return $"{gItemName}\\{mDll64.Platform_Release_Dll_String()}";
+            return $"{gCompelierVersion}\\{gItemName}\\{mDll64.Platform_Release_Dll_String()}";
         }
         public string DllName_64_Release_Include_String()
         {
-            return $"{gItemName}\\{mDll64.Platform_Release_Include_String()}";
+            return $"{gCompelierVersion}\\{gItemName}\\{mDll64.Platform_Release_Include_String()}";
         }
 
         public string DllName_32_Debug_Lib_String()
         {
-            return $"{gItemName}\\{mDll32.Platform_Debug_Lib_String()}";
+            return $"{gCompelierVersion}\\{gItemName}\\{mDll32.Platform_Debug_Lib_String()}";
         }
         public string DllName_32_Debug_Dll_String()
         {
-            return $"{gItemName}\\{mDll32.Platform_Debug_Dll_String()}";
+            return $"{gCompelierVersion}\\{gItemName}\\{mDll32.Platform_Debug_Dll_String()}";
         }
         public string DllName_32_Debug_Include_String()
         {
-            return $"{gItemName}\\{mDll32.Platform_Debug_Include_String()}";
+            return $"{gCompelierVersion}\\{gItemName}\\{mDll32.Platform_Debug_Include_String()}";
         }
 
         public string DllName_32_Release_Lib_String()
         {
-            return $"{gItemName}\\{mDll32.Platform_Release_Lib_String()}";
+            return $"{gCompelierVersion}\\{gItemName}\\{mDll32.Platform_Release_Lib_String()}";
         }
         public string DllName_32_Release_Dll_String()
         {
-            return $"{gItemName}\\{mDll32.Platform_Release_Dll_String()}";
+            return $"{gCompelierVersion}\\{gItemName}\\{mDll32.Platform_Release_Dll_String()}";
         }
         public string DllName_32_Release_Include_String()
         {
-            return $"{gItemName}\\{mDll32.Platform_Release_Include_String()}";
+            return $"{gCompelierVersion}\\{gItemName}\\{mDll32.Platform_Release_Include_String()}";
         }
         /// <summary>
         /// 库的版本
@@ -320,6 +319,25 @@ namespace XPloteQuickBuidProj
                 }
             }
         }
+
+
+        private string? mCompelierVersion;
+        /// <summary>
+        /// 写入编译版本
+        /// </summary>
+        public string? gCompelierVersion
+        {
+            get => mCompelierVersion;
+            set
+            {
+                if (mCompelierVersion != value)
+                {
+                    mCompelierVersion = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
+
 
 
         /// <summary>
