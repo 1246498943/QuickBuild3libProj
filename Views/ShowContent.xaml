@@ -22,14 +22,28 @@
     <Grid>
         <TabControl x:Name="TabControlName">
             <TabItem Header="写入的内容" >
-                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <!--<ScrollViewer VerticalScrollBarVisibility="Auto">
                     <TextBox ScrollViewer.CanContentScroll="True" TextWrapping="Wrap" x:Name="FlowDocumentName"></TextBox>
-                </ScrollViewer>
+                </ScrollViewer>-->
+                <avalonEdit:TextEditor xmlns:avalonEdit="http://icsharpcode.net/sharpdevelop/avalonedit"
+                       Name="FlowDocumentName"
+                       SyntaxHighlighting="XML"
+                       FontFamily="Consolas"
+                       FontSize="10pt"
+                       LineNumbersForeground="Black"
+                       ShowLineNumbers="False">
+                </avalonEdit:TextEditor>
             </TabItem>
             <TabItem Header="写入之后的配置文件">
-                <ScrollViewer VerticalScrollBarVisibility="Auto">
-                    <TextBox ScrollViewer.CanContentScroll="True" TextWrapping="Wrap" x:Name="vcxProjContentName"></TextBox>
-                </ScrollViewer>
+                <avalonEdit:TextEditor xmlns:avalonEdit="http://icsharpcode.net/sharpdevelop/avalonedit"
+                       Name="vcxProjContentName"
+                       SyntaxHighlighting="XML"
+                       FontFamily="Consolas"
+                       FontSize="10pt"
+                       LineNumbersForeground="Black"
+                       ShowLineNumbers="True">
+                    </avalonEdit:TextEditor>
+               
             </TabItem>
         </TabControl>
     </Grid>
