@@ -470,7 +470,7 @@ namespace XPloteQuickBuidProj
             if (status==false)
             {
                 var dtype = $"{mX64Or32.ToString()}_{mDebug.ToString()}_{mDllType.ToString()}";
-                GlobalSingleHelper.SendLogInfo($" {dtype} 没有找到对应的模块,请在原始vcxproj中,手动设置对应的x64-Debug/Release等模式");
+                GlobalSingleHelper.SendLogInfo($" {dtype} 没有找到对应的模块,请在原始vcxproj中,手动设置对应的{dtype}等模式");
                 return;
             }
 
