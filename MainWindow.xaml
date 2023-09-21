@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:XPloteQuickBuidProj"
         mc:Ignorable="d"
-        Title="XPloteQuickBuild" Height="800" Width="1000">
+        Title="XPloteQuickBuild" Height="900" Width="1100">
     <Window.Resources>
         <ResourceDictionary>
             <Style TargetType="{x:Type Label}">
@@ -186,7 +186,7 @@
             <RowDefinition Height="2*"></RowDefinition>
             <RowDefinition Height="2*"></RowDefinition>
             <RowDefinition Height="60"></RowDefinition>
-            <RowDefinition Height="50"></RowDefinition>
+            <RowDefinition Height="100"></RowDefinition>
         </Grid.RowDefinitions>
         <Border Grid.Row="0">
             <GroupBox Header="SDK目录设置" Margin="0,5,0,0">
@@ -271,7 +271,7 @@
             <DockPanel LastChildFill="True" VerticalAlignment="Center">
                 <GroupBox DockPanel.Dock="Right" VerticalAlignment="Center" Margin="10,2,0,0" >
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                        <CheckBox VerticalAlignment="Center" IsChecked="{Binding gMode.gBuildModel.gIsCover}" ToolTip="是否清空原vcxproj配置" Content="覆盖vcxproj原始内容?" Margin="10,0"></CheckBox>
+                        <CheckBox VerticalAlignment="Center" IsChecked="{Binding gModel.gBuildModel.gIsCover}" ToolTip="是否清空原vcxproj配置" Content="覆盖vcxproj原始内容?" Margin="10,0"></CheckBox>
                         <Button Content="查阅写入内容" Command="{Binding gModel.gLookWriteContent}" Width="100" Margin="10,0"></Button>
                         <Button Content="构建" Command="{Binding gModel.gBuildAndWriteConfig2VCProj}" Width="100"></Button>
                     </StackPanel>
@@ -281,8 +281,15 @@
                 <TextBlock TextTrimming="CharacterEllipsis" VerticalAlignment="Center" Margin="0,5,0,0" ToolTip="{Binding gModel.gBuildModel.gVcxprojFile}" Text="{Binding gModel.gBuildModel.gVcxprojFile}"></TextBlock>
             </DockPanel>
         </Border>
-        <Border Grid.Row="4">
-            <TextBlock x:Name="LogName" Foreground="Gray" Opacity="0.99"  HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
-        </Border>
+        <GroupBox Grid.Row="4" Header="日志" Margin="0,8,0,0">
+            <ListBox x:Name="ListLogBoxName" ScrollViewer.CanContentScroll="True" ScrollViewer.VerticalScrollBarVisibility="Auto">
+                <ListBox.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="清空" Click="MenuItem_Click_log"></MenuItem>
+                    </ContextMenu>
+                </ListBox.ContextMenu>
+            </ListBox>
+            <!--<TextBlock x:Name="LogName" Foreground="Gray" Opacity="0.99"  HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>-->
+        </GroupBox>
     </Grid>
 </Window>

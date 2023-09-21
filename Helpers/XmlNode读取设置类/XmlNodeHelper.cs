@@ -213,19 +213,20 @@ namespace XPloteQuickBuidProj
                                 //递归到了下一层节点
                                 mIndex+=1;
                                 ChangeContent2XmlNode(nodeItem, mNodeNameLists,  ContentStr, IsOverride, ref mIndex);
-
+                                return;
                             }
                         }
                         else
                         {
                             mIndex+=1;
                             ChangeContent2XmlNode(nodeItem, mNodeNameLists,  ContentStr, IsOverride, ref mIndex);
+                            return;
                         }
-                        return;
+                       
                     }
                     else
                     {
-                        GetContentValueFromNodeLists(nodeItem, mNodeNameLists, ref ContentStr, ref mIndex);
+                        ChangeContent2XmlNode(nodeItem, mNodeNameLists,  ContentStr, IsOverride, ref mIndex);
                     }
 
                 }
@@ -248,7 +249,6 @@ namespace XPloteQuickBuidProj
                 {
                     if (nodeItem.Name== curSearchNode.NodeName)
                     {
-                        SearchStatus[mIndex] = true;
                         if (curSearchNode.IsContition==true) //一层是判断属性条件 / 一层树不需要判断.
                         {
                             bool isConditionExits = false;
@@ -262,23 +262,27 @@ namespace XPloteQuickBuidProj
                             }
                             if(isConditionExits==true)
                             {
+                             
                                 string conditionStr = nodeItem.Attributes["Condition"].Value;
                                 if (conditionStr == curSearchNode.AttribConditionValue)
                                 {
                                     //递归到了下一层节点
+                                    SearchStatus[mIndex] = true;
                                     mIndex+=1;
                                     IsExitsXmlNode(nodeItem, mNodeNameLists, SearchStatus, ref mIndex);
-
+                                    return;
                                 }
                             }
                             
                         }
                         else
                         {
+                            SearchStatus[mIndex] = true;
                             mIndex+=1;
                             IsExitsXmlNode(nodeItem, mNodeNameLists, SearchStatus, ref mIndex);
+                            return;
                         }
-                        return;
+                       
                     }
                     else
                     {
@@ -295,7 +299,7 @@ namespace XPloteQuickBuidProj
 
         public static bool IsExitsXmlNode(XmlNode node, List<SearchNode> mNodeNameLists)
         {
-            bool status = false;
+            bool status = true;
             List<bool> listStatus = new List<bool>();
             for(int i =0;i<mNodeNameLists.Count; i++)
             {
@@ -333,8 +337,6 @@ namespace XPloteQuickBuidProj
                 {
                     if (nodeItem.Name== curSearchNode.NodeName)
                     {
-                        SearchStatus[mIndex] = true;
-                        outNodeList.Add(nodeItem);
                         if (curSearchNode.IsContition==true) //一层是判断属性条件,有判断条件的这一层.
                         {
                             bool isConditionExits = false;
@@ -352,19 +354,25 @@ namespace XPloteQuickBuidProj
                                 if (conditionStr == curSearchNode.AttribConditionValue)
                                 {
                                     //递归到了下一层节点
+                                    SearchStatus[mIndex] = true;
+                                    outNodeList.Add(nodeItem);//找到呢正确的,然后从这个节点下,搜索剩余的节点
                                     mIndex+=1;
                                     CheckIsAddXmlNode(nodeItem, mNodeNameLists, SearchStatus,ref outNodeList, ref mIndex);
-
+                                    return;
                                 }
                             }
                            
                         }
                         else
                         {
+                            //递归到了下一层节点
+                            SearchStatus[mIndex] = true;
+                            outNodeList.Add(nodeItem);//找到呢正确的,然后从这个节点下,搜索剩余的节点
                             mIndex+=1;
                             CheckIsAddXmlNode(nodeItem, mNodeNameLists, SearchStatus,ref outNodeList, ref mIndex);
+                            return;
                         }
-                        return;
+                       
                     }
                     else
                     {
@@ -425,7 +433,7 @@ namespace XPloteQuickBuidProj
                         {
                             //才会去创建新的节点.
                             // var nRoot = curNode.OwnerDocument.CreateNode(XmlNodeType.Element, curSearchNode.NodeName, "");
-                            var nRoot = curNode.OwnerDocument.CreateElement(curSearchNode.NodeName,null);
+                            var nRoot = curNode.OwnerDocument.CreateElement(curSearchNode.NodeName, curNode.NamespaceURI);
                             curNode.AppendChild(nRoot);
                             if (curSearchNode.IsContition==true)
                             {
@@ -455,13 +463,14 @@ namespace XPloteQuickBuidProj
             var listSearch = Params.Item1;
             var postFix = Params.Item2;
 
-            XmlNodeHelper.AutoCreateAndAddXmlNode(node, listSearch);//自动构建
-            //
+            XmlNodeHelper.AutoCreateAndAddXmlNode(node, listSearch);//自动构建,如果这一步成功的话,下面这个检测就不应该有问题!!!
+
             //在获取到模块之后,如果检测到没有的话...就给其添加...
             bool status = IsExitsXmlNode(node, listSearch);
-            if(status==false)
+            if (status==false)
             {
-                GlobalSingleHelper.SendLogInfo("没有找到对应的模块,请在原始vcxproj中,手动设置对应的x64-Debug/Release等模式");
+                var dtype = $"{mX64Or32.ToString()}_{mDebug.ToString()}_{mDllType.ToString()}";
+                GlobalSingleHelper.SendLogInfo($" {dtype} 没有找到对应的模块,请在原始vcxproj中,手动设置对应的x64-Debug/Release等模式");
                 return;
             }
 
@@ -498,7 +507,7 @@ namespace XPloteQuickBuidProj
                         result.Add(T1);
                         result.Add(T2);
                         result.Add(T3);
-                        postFixDes = @";%(AdditionalIncludeDirectories)";
+                        postFixDes = @"%(AdditionalIncludeDirectories)";
                         break;
                     }
                 case DllType.Lib:
@@ -509,7 +518,7 @@ namespace XPloteQuickBuidProj
                         result.Add(T1);
                         result.Add(T2);
                         result.Add(T3);
-                        postFixDes = @";%(AdditionalLibraryDirectories)";
+                        postFixDes = @"%(AdditionalLibraryDirectories)";
                         break;
                     }
                 case DllType.LibLists:
@@ -520,7 +529,7 @@ namespace XPloteQuickBuidProj
                         result.Add(T1);
                         result.Add(T2);
                         result.Add(T3);
-                        postFixDes = @";%(AdditionalDependencies)";
+                        postFixDes = @"%(AdditionalDependencies)";
                         break;
                     }
                 case DllType.Dll:

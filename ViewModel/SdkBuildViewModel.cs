@@ -530,7 +530,28 @@ namespace XPloteQuickBuidProj
                     XmlNodeHelper.WriteContent2VcxProjXmlNode(root, contentStr, isCover, plateForm,mDebug,mDlltype);
                 }
                 doc.Save(vcxProjFile);
-                str = root.InnerText;
+
+
+                //格式化内容:
+                //string formattedXml = root.OuterXml;
+                //formattedXml = string.Replace(formattedXml, "<", "<\n");
+                //formattedXml = System.Text.RegularExpressions.Regex.Replace(formattedXml, "(?<=>)[^<]*(?=<)", "\t");
+                //str = formattedXml;
+               
+                // 创建一个 StringBuilder 对象用于存储输出的内容
+                StringBuilder sb = new StringBuilder();
+                StringWriter sw = new StringWriter(sb);
+                XmlTextWriter writer = new XmlTextWriter(sw);
+                // 设置 XmlTextWriter 的格式选项
+                writer.Formatting = Formatting.Indented; // 使用缩进格式
+                writer.Indentation = 4; // 设置缩进空格数为 4
+                writer.IndentChar = ' '; // 设置缩进字符为空格
+                  // 将 XmlDocument 的内容写入 XmlTextWriter
+                doc.WriteContentTo(writer);
+                // 关闭 XmlTextWriter 和 StringWriter
+                writer.Close();
+                sw.Close();
+                str = sb.ToString();
             }
 
             return str;
@@ -584,6 +605,7 @@ namespace XPloteQuickBuidProj
                 SdkStrDes[i] = "";
             }
             string postFix = "\r\n";
+            var curSdkDir = $"{gBuildModel.gSdkDir}\\";
             foreach (var sdkItem in gBuildModel?.gBuildSdkSource)
             {
                 //64/debug/
@@ -591,9 +613,9 @@ namespace XPloteQuickBuidProj
                 {
                     if (sdkItem.gDll64.gDebug.gIsChecked==true)
                     {
-                        SdkStrDes[0]+=$"{sdkItem.DllName_64_Debug_Lib_String()};{postFix}";
-                        SdkStrDes[1]+=$"{sdkItem.DllName_64_Debug_Dll_String()};{postFix}";
-                        SdkStrDes[2]+=$"{sdkItem.DllName_64_Debug_Include_String()};{postFix}";
+                        SdkStrDes[0]+=$"{curSdkDir}{sdkItem.DllName_64_Debug_Lib_String()};{postFix}";
+                        SdkStrDes[1]+=$"{curSdkDir}{sdkItem.DllName_64_Debug_Dll_String()};{postFix}";
+                        SdkStrDes[2]+=$"{curSdkDir}{sdkItem.DllName_64_Debug_Include_String()};{postFix}";
                         foreach (var libName in sdkItem.gDll64.gDebug.gLibDir.gLibSources)
                         {
                             SdkStrDes[3]+=$"{libName}{postFix}";
@@ -602,9 +624,9 @@ namespace XPloteQuickBuidProj
                     if (sdkItem.gDll64.gRelease.gIsChecked==true)
                     {
                         //64/Release/
-                        SdkStrDes[4]+=$"{sdkItem.DllName_64_Release_Lib_String()};{postFix}";
-                        SdkStrDes[5]+=$"{sdkItem.DllName_64_Release_Dll_String()};{postFix}";
-                        SdkStrDes[6]+=$"{sdkItem.DllName_64_Release_Include_String()};{postFix}";
+                        SdkStrDes[4]+=$"{curSdkDir}{sdkItem.DllName_64_Release_Lib_String()};{postFix}";
+                        SdkStrDes[5]+=$"{curSdkDir}{sdkItem.DllName_64_Release_Dll_String()};{postFix}";
+                        SdkStrDes[6]+=$"{curSdkDir}{sdkItem.DllName_64_Release_Include_String()};{postFix}";
                         foreach (var libName in sdkItem.gDll64.gRelease.gLibDir.gLibSources)
                         {
                             SdkStrDes[7]+=$"{libName}{postFix}";
@@ -618,9 +640,9 @@ namespace XPloteQuickBuidProj
                     if (sdkItem.gDll32.gDebug.gIsChecked==true)
                     {
 
-                        SdkStrDes[8]+=$"{sdkItem.DllName_32_Debug_Lib_String()};{postFix}";
-                        SdkStrDes[9]+=$"{sdkItem.DllName_32_Debug_Dll_String()};{postFix}";
-                        SdkStrDes[10]+=$"{sdkItem.DllName_32_Debug_Include_String()};{postFix}";
+                        SdkStrDes[8]+=$"{curSdkDir}{sdkItem.DllName_32_Debug_Lib_String()};{postFix}";
+                        SdkStrDes[9]+=$"{curSdkDir}{sdkItem.DllName_32_Debug_Dll_String()};{postFix}";
+                        SdkStrDes[10]+=$"{curSdkDir}{sdkItem.DllName_32_Debug_Include_String()};{postFix}";
                         foreach (var libName in sdkItem.gDll32.gDebug.gLibDir.gLibSources)
                         {
                             SdkStrDes[11]+=$"{libName}{postFix}";
@@ -629,9 +651,9 @@ namespace XPloteQuickBuidProj
                     }
                     if (sdkItem.gDll32.gRelease.gIsChecked==true)
                     {
-                        SdkStrDes[12]+=$"{sdkItem.DllName_32_Release_Lib_String()};{postFix}";
-                        SdkStrDes[13]+=$"{sdkItem.DllName_32_Release_Dll_String()};{postFix}";
-                        SdkStrDes[14]+=$"{sdkItem.DllName_32_Release_Include_String()};{postFix}";
+                        SdkStrDes[12]+=$"{curSdkDir}{sdkItem.DllName_32_Release_Lib_String()};{postFix}";
+                        SdkStrDes[13]+=$"{curSdkDir}{sdkItem.DllName_32_Release_Dll_String()};{postFix}";
+                        SdkStrDes[14]+=$"{curSdkDir}{sdkItem.DllName_32_Release_Include_String()};{postFix}";
                         foreach (var libName in sdkItem.gDll32.gRelease.gLibDir.gLibSources)
                         {
                             SdkStrDes[15]+=$"{libName}{postFix}";

@@ -36,7 +36,9 @@ namespace XPloteQuickBuidProj
 
         private void GlobalSingleHelper_SendLogInfoHandler(string? obj)
         {
-            LogName.Text =obj;
+            //LogName.Text =obj;
+            ListLogBoxName.Items.Add($"{ListLogBoxName.Items.Count.ToString("D5")}:  {obj}");
+            ListLogBoxName.ScrollIntoView(ListLogBoxName.Items[ListLogBoxName.Items.Count-1]);
         }
 
         private void XPloteMainWidow_Closed(object? sender, EventArgs e)
@@ -105,6 +107,9 @@ namespace XPloteQuickBuidProj
             return source;
         }
 
-     
+        private void MenuItem_Click_log(object sender, RoutedEventArgs e)
+        {
+            ListLogBoxName.Items.Clear();
+        }
     }
 }
