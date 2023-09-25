@@ -92,8 +92,8 @@ namespace XPloteQuickBuidProj
                         ResultStr = nodeItem.InnerText;
                         if (curSearchNode.IsContition==true) //一层是判断属性条件 / 一层树不需要判断.
                         {
-                            string conditionStr = nodeItem.Attributes["Condition"].Value;
-                            if(conditionStr == curSearchNode.AttribConditionValue)
+                            string conditionStr = nodeItem.Attributes["Condition"].Value.Replace(" ", "");
+                            if(conditionStr == curSearchNode.AttribConditionValue.Replace(" ", ""))
                             {
                                 //递归到了下一层节点
                                mIndex+=1;
@@ -142,8 +142,8 @@ namespace XPloteQuickBuidProj
                         outNode = nodeItem;
                         if (curSearchNode.IsContition==true) //一层是判断属性条件 / 一层树不需要判断.
                         {
-                            string conditionStr = nodeItem.Attributes["Condition"].Value;
-                            if (conditionStr == curSearchNode.AttribConditionValue)
+                            string conditionStr = nodeItem.Attributes["Condition"].Value.Replace(" ", "");
+                            if (conditionStr == curSearchNode.AttribConditionValue.Replace(" ", ""))
                             {
                                 //递归到了下一层节点
                                 mIndex+=1;
@@ -207,8 +207,8 @@ namespace XPloteQuickBuidProj
 
                         if (curSearchNode.IsContition==true) //一层是判断属性条件 / 一层树不需要判断.
                         {
-                            string conditionStr = nodeItem.Attributes["Condition"].Value;
-                            if (conditionStr == curSearchNode.AttribConditionValue)
+                            string conditionStr = nodeItem.Attributes["Condition"].Value.Replace(" ", "");
+                            if (conditionStr == curSearchNode.AttribConditionValue.Replace(" ", ""))
                             {
                                 //递归到了下一层节点
                                 mIndex+=1;
@@ -263,8 +263,8 @@ namespace XPloteQuickBuidProj
                             if(isConditionExits==true)
                             {
                              
-                                string conditionStr = nodeItem.Attributes["Condition"].Value;
-                                if (conditionStr == curSearchNode.AttribConditionValue)
+                                string conditionStr = nodeItem.Attributes["Condition"].Value.Replace(" ", "");
+                                if (conditionStr == curSearchNode.AttribConditionValue.Replace(" ", ""))
                                 {
                                     //递归到了下一层节点
                                     SearchStatus[mIndex] = true;
@@ -350,8 +350,9 @@ namespace XPloteQuickBuidProj
                             }
                             if(isConditionExits==true)
                             {
-                                string conditionStr = nodeItem.Attributes["Condition"].Value;
-                                if (conditionStr == curSearchNode.AttribConditionValue)
+                                //注意,去掉之间的空格,否则容易出错
+                                string conditionStr = nodeItem.Attributes["Condition"].Value.Replace(" ","");
+                                if (conditionStr == curSearchNode.AttribConditionValue.Replace(" ", ""))
                                 {
                                     //递归到了下一层节点
                                     SearchStatus[mIndex] = true;
