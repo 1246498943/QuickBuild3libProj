@@ -237,6 +237,7 @@ namespace XPloteQuickBuidProj
             }
         }
 
+
         private static void IsExitsXmlNode(XmlNode node, List<SearchNode> mNodeNameLists,List<bool> SearchStatus,ref int mIndex)
         {
             if (node==null) return;
@@ -262,10 +263,16 @@ namespace XPloteQuickBuidProj
                             }
                             if(isConditionExits==true)
                             {
-                             
+
+                                //把单引号替换成双引号...."'$(Configuration)|$(Platform)' == 'Debug|x64'"
+                                //string str = "\"'$(Configuration)|$(Platform)' == 'Debug|x64'\"";
                                 string conditionStr = nodeItem.Attributes["Condition"].Value;
-                                if (conditionStr == curSearchNode.AttribConditionValue)
+                                if (string.Equals(conditionStr, curSearchNode.AttribConditionValue))
                                 {
+
+                                    GlobalSingleHelper.SendLogInfo(conditionStr);
+                                    GlobalSingleHelper.SendLogInfo(curSearchNode.AttribConditionValue);
+
                                     //递归到了下一层节点
                                     SearchStatus[mIndex] = true;
                                     mIndex+=1;
