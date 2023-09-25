@@ -214,6 +214,12 @@
                                 <ListBox HorizontalContentAlignment="Stretch"
                                          ItemsSource="{Binding gModel.gBuildModel.gCompelierSource}"
                                          ItemTemplate="{StaticResource comPelierTemPlate}">
+                                    <ListBox.ContextMenu>
+                                        <ContextMenu>
+                                            <MenuItem Header="全选" Command="{Binding gModel.gSelectedAll}"></MenuItem>
+                                            <MenuItem Header="全部取消" Command="{Binding gModel.gUnSelectedAll}"></MenuItem>
+                                        </ContextMenu>
+                                    </ListBox.ContextMenu>
 
                                 </ListBox>
                             </ScrollViewer>

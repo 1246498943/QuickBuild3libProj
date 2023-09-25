@@ -64,6 +64,10 @@ namespace XPloteQuickBuidProj
         public ICommand? gImportSdk2List { get; set; } //导入库
         public ICommand? gCreateStructDirs { get; set; }//在当前的Dir下,创建新的结构目录.
 
+        public ICommand? gSelectedAll { get; set; }
+
+        public ICommand? gUnSelectedAll { get; set; }
+
         public ICommand? gImportSettingConfig { get; set; }//导入配置文件.
         public ICommand? gCheckIsSucessSetConfig { get; set; }//校验配置文件,将配置文件中-sdk目录中的比较,不符合的,设置层红色.
 
@@ -141,6 +145,39 @@ namespace XPloteQuickBuidProj
             });
 
             gImportSdk2List = new RelayCommand(() => { ImportDllContent2Lists(); });
+
+
+            gSelectedAll = new RelayCommand(() => {
+
+                var curListDatas = gBuildModel?.gCompelierSource;
+                if(curListDatas!=null)
+                {
+                    foreach (var item in curListDatas)
+                    {
+                        foreach (var sdkItem in item.gSdkItemList)
+                        {
+                            sdkItem.gIsChecked = true;
+                        }
+                    }
+                }
+
+            });
+
+            gUnSelectedAll = new RelayCommand(() => {
+
+                var curListDatas = gBuildModel?.gCompelierSource;
+                if (curListDatas!=null)
+                {
+                    foreach (var item in curListDatas)
+                    {
+                        foreach (var sdkItem in item.gSdkItemList)
+                        {
+                            sdkItem.gIsChecked = false;
+                        }
+                    }
+                }
+
+            });
 
             gCreateStructDirs = new RelayCommand(() => {
             
